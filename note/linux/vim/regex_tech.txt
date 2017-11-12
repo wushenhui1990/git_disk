@@ -1,0 +1,1 @@
+需要完全像notepad++那样，加\v在pattern前开启very magic

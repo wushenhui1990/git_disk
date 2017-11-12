@@ -1,0 +1,16 @@
+trash()
+{
+	mv $@ ~/.trash
+}
+undelffile()
+{
+	mv -i ~/.trash/$@ ./
+}
+cleartrash()
+{
+	read -p "clear sure?[n]" confirm
+	[ $confirm == 'y' ] || [ $confirm == 'Y' ] && /usr/bin/rm -rf ~/.trash/*
+}
+alias rm=trash
+alias rl='ls ~/.trash'
+alias urm=undelfile

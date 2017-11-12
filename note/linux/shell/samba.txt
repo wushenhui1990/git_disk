@@ -1,0 +1,1 @@
+mount -t cifs -o user=luke%password //192.168.1.104/share /mnt/linky_share

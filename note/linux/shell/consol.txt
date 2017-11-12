@@ -1,0 +1,9 @@
+标  题: Re: securecrt中退出vim怎么让vim的内容不继续留在屏幕上呢
+发信站: 水木社区 (Fri Jul  9 14:34:35 2010), 站内
+  
+嗯，在官方论坛找到了解决方案，谢谢哈
+  
+【 在 zhjin (sweptAway) 的大作中提到: 】
+: 在 .bashrc 中加入一行  
+: export TERM=xterm
+  

@@ -1,0 +1,11 @@
+CONFIG:
+RTL8192CU
+CIFS
+MODULES
+MODULE_UNLOAD
+
+
+> @@ -382,7 +382,7 @@ static struct gpio_chip bcm2835_gpio_chip = {
+
+> - .base = -1,
+> + .base = 0,

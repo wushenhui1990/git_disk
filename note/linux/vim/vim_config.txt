@@ -1,0 +1,5 @@
+1. tabstop：表示一个 tab 显示出来是多少个空格，默认 8
+2. softtabstop：在编辑的时候（比如按退格或 tab 键）一个 tab 是多少个空格（有点不好理解。。。我也没完全弄明白）
+3. expandtab/noexpandtab：将 tab 扩展/不扩展成空格
+4. shiftwidth：每一级缩进是多少个空格
+5. smarttab：根据文件中其他地方的缩进空格个数来确定一个 tab 是多少个空格

@@ -1,0 +1,60 @@
+查看不可见字符set list 反向设置:set list&
+
+1 重新载入当前文件：
+
+    :e
+    :e! #放弃当前修改，强制重新载入
+
+2 重新载入所有打开的文件：
+
+    :bufdo e 或者 :bufdo :e!
+	
+To see a list of current buffers, I use:
+:ls
+
+To open a new file, I use
+:e ../myFile.pl
+
+To switch between all open files, I use
+:b myfile
+with enhanced tab completion (still set wildmenu).
+Note: :b# chooses the last visited file, so you can use it to switch quickly between two files.
+
+How do I close a single buffer (out of many) in Vim?
+A word of caution: "w does not stand for write but for wipeout!"
+More from manuals:
+:bd
+Unload buffer [N] (default: current buffer) and delete it from the buffer list. If the buffer was changed, this fails, unless when [!] is specified, in which case changes are lost. The file remains unaffected.
+If you know what your're doing, you can also use :bw
+:bw
+Like |:bdelete|, but really delete the buffer.
+
+
+
+How to temporarily exit vim and go back
+Assuming terminal vim on a flavor of *nix:
+To suspend your running vim
+control-z
+will suspend the process and get back to your shell
+fg
+will resume (bring to foreground) your suspended vim
+To start a new shell
+start a subshell using:
+:sh
+(as configured by)
+:set shell?
+or
+:!bash
+followed by:
+control-d  (or exit, but why type so much?)
+to kill the shell and return to vim
+
+
+显示文件名
+：file
+:ls
+ctrl +g
+
+
+
+	

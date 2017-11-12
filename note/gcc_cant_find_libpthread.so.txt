@@ -1,0 +1,6 @@
+crosstools-ng can't find pthread.so
+
+
+Using the GCC --sysroot=dir flag should fix the issue. This flag tells GCC to search both headers and libraries under the dir folder.
+
+In your case, if you add --sysroot=/home/user/rpi_root to linker flags, ld will search for /home/user/rpi_root/lib/libpthread.so.0 instead of just /lib/libpthread.so.0

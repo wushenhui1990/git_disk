@@ -1,0 +1,55 @@
+I'm trying to remove part of the path in a string. I have the path:
+
+/path/to/file/drive/file/path/
+I want to remove the first part /path/to/file/drive and produce the output:
+
+file/path/
+
+You can also use POSIX shell variable expansion to do this.
+
+path=/path/to/file/drive/file/path/
+echo ${path#/path/to/file/drive/}
+The #.. part strips off a leading matching string when the variable is expanded; this is especially useful if your strings are already in shell variables, like if you're using a for loop. You can strip matching strings (e.g., an extension) from the end of a variable also, using %.... See the bash man page for the gory details.
+
+
+
+If you wanted to remove a certain NUMBER of path components, you should use cut with -d'/'. For example, if path=/home/dude/some/deepish/dir:
+
+To remove the first two components:
+
+# (Add 2 to the number of components to remove to get the value to pass to -f)
+$ echo $path | cut -d'/' -f4-
+some/deepish/dir
+To keep the first two components:
+
+$ echo $path | cut -d'/' -f-3
+/home/dude
+To remove the last two components (rev reverses the string):
+
+$ echo $path | rev | cut -d'/' -f4- | rev
+/home/dude/some
+To keep the last three components:
+
+$ echo $path | rev | cut -d'/' -f-3 | rev
+some/deepish/dir
+Or, if you want to remove everything before a particular component, sed would work:
+
+$ echo $path | sed 's/.*\(some\)/\1/g'
+some/deepish/dir
+Or after a particular component:
+
+$ echo $path | sed 's/\(dude\).*/\1/g'
+/home/dude
+It's even easier if you don't want to keep the component you're specifying:
+
+$ echo $path | sed 's/some.*//g'
+/home/dude/
+And if you want to be consistent you can match the trailing slash too:
+
+$ echo $path | sed 's/\/some.*//g'
+/home/dude
+Of course, if you're matching several slashes, you should switch the sed delimiter:
+
+$ echo $path | sed 's!/some.*!!g'
+/home/dude
+Note that these examples all use absolute paths, you'll have to play around to make them work with relative paths.
