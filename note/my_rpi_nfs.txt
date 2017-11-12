@@ -1,0 +1,49 @@
+host:
+# ip link set up dev net0
+# ip addr add 192.168.123.100/24 dev net0 # arbitrary address
+
+# sysctl -a | grep forward
+
+# sysctl net.ipv4.ip_forward=1
+/etc/sysctl.d/30-ipforward.conf
+net.ipv4.ip_forward=1
+net.ipv6.conf.default.forwarding=1
+net.ipv6.conf.all.forwarding=1
+
+Enable NAT
+# iptables -t nat -A POSTROUTING -o internet0 -j MASQUERADE
+# iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+# iptables -A FORWARD -i net0 -o internet0 -j ACCEPT
+
+/srv/nfs        	192.168.1.0/24(rw,no_root_squash)
+/srv/nfs/office     192.168.1.0/24(rw)
+/srv/nfs/my        	192.168.1.0/24(rw,no_root_squash)
+
+no_root_squash is important
+
+https://elinux.org/RPi_U-Boot
+
+-----------------------------------------------------------------
+client:
+
+usb start
+
+setenv serverip 192.168.1.100
+setenv ipaddr 192.168.1.101
+setenv fdtfile bcm2708-rpi-b-plus.dtb
+tftp ${fdt_addr_r} ${fdtfile}
+
+tftp ${kernel_addr_r} zImage
+bootz ${kernel_addr_r} - ${fdt_addr_r}
+
+setenv bootargs "dwc_otg.lpm_enable=0 console=ttyAMA0,115200 kgdboc=ttyAMA0,115200 console=tty1 root=/dev/nfs nfsroot=192.168.1.100:/srv/nfs/office ip=192.168.1.101:192.168.1.100 rootfstype=nfs nfsrootdebug"
+
+setenv bootargs "dwc_otg.lpm_enable=0 console=ttyAMA0,115200 root=/dev/nfs nfsroot=192.168.1.100:/srv/nfs/my ip=192.168.1.101:192.168.1.100 rootfstype=nfs rw nfsrootdebug init=/linuxrc"
+
+setenv bootargs "dwc_otg.lpm_enable=0 console=ttyAMA0,115200 kgdboc=ttyAMA0,115200 console=tty1 root=/dev/nfs nfsroot=192.168.1.100:/srv/nfs/my ip=192.168.1.101:192.168.1.100 rootfstype=nfs rw nfsrootdebug"
+
+
+saveenv to save setted env
+setenv bootcmd "tftp ${fdt_addr_r} ${fdtfile};tftp ${kernel_addr_r} zImage;bootz ${kernel_addr_r} - ${fdt_addr_r}"
+
+

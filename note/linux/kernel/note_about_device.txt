@@ -1,0 +1,1 @@
+add device has a power class,add in device_add()fun in /drivers/base/core.c,by dpm_sysfs_add() and device_pm_add();

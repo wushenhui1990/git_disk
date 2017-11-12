@@ -1,0 +1,29 @@
+mv 除特定文件之外的其他文件
+mv `find -maxdepth 1 -not -name "..."` ...
+
+rm -rf !(keep) #删除keep文件之外的所有文件
+rm -rf !(keep1 | keep2) #删除keep1和keep2文件之外的所有文件
+
+ls | grep -v keep | xargs rm #删除keep文件之外的所有文件
+
+find ./test/ | grep -v keep | xargs rm #删除当前test文件夹中keep文件之外的所有文件
+
+find ./ -name '[^k][^e][^e][^p]*'  -exec rm -rf {} \; #删除keep以外的其他文件。
+find ./ -name '[^k][^e][^e][^p]*'  | xargs rm -rf  #删除keep以外的其他文件。推荐！
+说明：上面第二行的代码效率高些，原因在于删除多个文件时 -exec会启动多个进程来处理，而xargs会启动一个rm进程来处理。
+
+
+列出除指定文件外其他文件
+ls |grep -v -E '...|...'
+
+
+如果上一个命令不成功，则。。。
+if [ $? -ne 0 ] then
+...
+fi
+
+
+grep abc 当前目录下除kernel外所有目录的.c,.cpp文件
+find `ls |grep -v kernel` -regex '.*.\(c\|cpp\)' |xargs grep "abc" -s
+
+

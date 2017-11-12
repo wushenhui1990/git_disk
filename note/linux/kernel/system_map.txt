@@ -1,0 +1,173 @@
+A for absolute
+B or b for uninitialized data section (called BSS)
+D or d for initialized data section
+G or g for initialized data section for small objects (global)
+i for sections specific to DLLs
+N for debugging symbol
+p for stack unwind section
+R or r for read only data section
+S or s for uninitialzed data section for small objects
+T or t for text (code) section
+U for undefined
+V or v for weak object
+W or w for weak objects which have not been tagged so
+- for stabs symbol in an a.out object file
+? for "symbol type unknown"
+
+There are 2 files that are used as a kernel symbol table:
+
+/proc/kallsyms
+System.map
+
+
+
+This page is a mirror of Peter Jay Salzman's System.map Explanation, and the only modification made by me is the addition of this note. --rworkman
+
+The system.map File
+
+There seems to be a dearth of information about the System.map file. It's really nothing mysterious, and in the scheme of things, it's really not that important. But a lack of documentation makes it shady. It's like an earlobe; we all have one, but nobody really knows why. This is a little web page I cooked up that explains the why.
+
+Note, I'm not out to be 100% correct. For instance, it's possible for a system to not have /proc filesystem support, but most systems do. I'm going to assume you "go with the flow" and have a fairly typical system.
+
+Some of the stuff on oopses comes from Alessandro Rubini's "Linux Device Drivers" which is where I learned most of what I know about kernel programming.
+
+
+What Are Symbols?
+
+In the context of programming, a symbol is the building block of a program: it is a variable name or a function name. It should be of no surprise that the kernel has symbols, just like the programs you write. The difference is, of course, that the kernel is a very complicated piece of coding and has many, many global symbols.
+
+
+What Is The Kernel Symbol Table?
+
+The kernel doesn't use symbol names like BytesRead(). It's much happier knowing a variable or function name by the variable or function's address, like c0343f20. Humans, on the other hand, do not appreciate addresses like c0343f20. We prefer to use symbol names like BytesRead(). Normally, this doesn't present much of a problem. The kernel is mainly written in C, so the compiler/linker allows us to use symbol names when we code and allows the kernel to use addresses when it runs. Everyone is happy.
+
+There are situations, however, where we need to know the address of a symbol (or the symbol for an address). This is done by a symbol table, and is very similar to how gdb can give you the function name from an address (or an address from a function name). A symbol table is a listing of all symbols along with their address. Here is an example of a symbol table:
+
+   c03441a0 B dmi_broken
+   c03441a4 B is_sony_vaio_laptop
+   c03441c0 b dmi_ident
+   c0344200 b pci_bios_present
+   c0344204 b pirq_table
+   c0344208 b pirq_router
+   c034420c b pirq_router_dev
+   c0344220 b ascii_buffer
+   c0344224 b ascii_buf_bytes
+You can see that the variable named dmi_broken is at the kernel address c03441a0.
+
+
+What Is The System.map File?
+
+There are 2 files that are used as a kernel symbol table:
+
+/proc/kallsyms
+System.map
+There. You now know what the System.map file is.
+
+Every time you compile a new kernel, the addresses of various symbol names are bound to change.
+
+/proc/kallsyms is a "proc file" that is created on the fly when a kernel boots up. Actually, it's not really a disk file; it's a representation of kernel data which is given the illusion of being a disk file. If you don't believe me, try finding the filesize of /proc/kallsyms. Therefore, it will always be correct for the kernel that is currently running.
+
+However, System.map is an actual file on your filesystem. When you compile a new kernel, your old System.map has wrong symbol information. A new System.map is generated with each kernel compile and you need to replace the old copy with your new copy.
+
+
+What Is An Oops?
+
+What is the most common bug in your homebrewed programs? The segfault. Good ol' signal 11.
+
+What is the most common bug in the Linux kernel? The segfault. Except here, the notion of a segfault is much more complicated and can be, as you can imagine, much more serious. When the kernel dereferences an invalid pointer, it's not called a segfault -- it's called an "oops". An oops indicates a kernel bug and should always be reported and fixed.
+
+Note that an oops is not the same thing as a segfault. Your program (usually) cannot recover from a segfault. The kernel doesn't necessarily have to be in an unstable state when an oops occurs. The Linux kernel is very robust; the oops may just kill the current process and leave the rest of the kernel in a good, solid state.
+
+An oops is not a kernel panic. In a panic, the kernel cannot continue; the system grinds to a halt and must be restarted. An oops may cause a panic if a vital part of the system is destroyed. An oops in a device driver, for example, will almost never cause a panic.
+
+When an oops occurs, the system will print out information that is relevent to debugging the problem, like the contents of all the CPU registers, and the location of page descriptor tables. In particular, the contents of the EIP (instruction pointer) is printed. Like this:
+
+   EIP: 0010:[<00000000>]
+   Call Trace: [<c010b860>]
+
+What Does An Oops Have To Do With System.map?
+
+The information given in EIP and Call Trace is not very informative. Since a kernel symbol doesn't have a fixed address until after the kernel is booted, c010b860 can point to any kernel symbol. Kernel developers wouldn't have the faintest clue where to begin looking for the bug if you simply reported an address. They need a symbol name to begin hunting for the bug.
+
+To help understand cryptic oops output, a daemon called klogd, the kernel logging daemon, is used to perform symbol-address translation. When an ooops occurs, klogd intercepts the oops report, translates addresses into symbol names (e.g. translating c010b860 into BytesRead()), and logs the event with the system logger, usually syslogd,
+
+To perform kernel symbol-address resolution, klogd uses System.map.
+
+There. Now you know what an oops has to do with System.map.
+
+Fine print:
+
+There are actually two types of address resolutions performed by klogd.
+
+Static translation, which uses the System.map file.
+Dynamic translation, which is used with loadable modules. These translations don't use System.map and is therefore not relevant to this discussion, but I'll describe it briefly anyhow:
+Klogd Dynamic Translation
+
+Suppose you load a kernel module which generates an oops. An oops message is generated, and klogd intercepts it. It is found that the oops occured at d00cf810. Since this address belongs to a dynamically loaded module, it has no entry in the System.map file. klogd will search for it, find nothing, and conclude that a loadable module must have generated the oops. klogd then queries the kernel for symbols that were exported by loadable modules. Even if the module author didn't export his symbols, at the very least, klogd will know what module generated the oops, which is better than knowing nothing about the oops at all.
+
+
+Where Should System.map Be Located?
+
+System.map should be located wherever the software that uses it looks for it. It's the only answer possible until some standards board (or someone of clear authority) mandates exactly where System.map should be located and what its name should be. With that in mind, let's look at some software packages and where they expect System.map to be. 
+
+klogd
+
+If klogd isn't given the location of System.map as a command line option with the -k switch, it uses the following string array (as of version 1.4.1) to search for it (see source code file ksym.c:
+
+      static char *system_maps[] =
+      {
+            "/boot/System.map",
+            "/System.map",
+      #if defined(TEST)
+            "./System.map",
+      #endif
+            (char *) 0
+      };
+	
+klogd looks for both "System.map" and "System.map-release" in these directories where "-release" is your kernel version. This is an intelligent search: if klogd finds a System.map for a kernel version that is different from the currently running kernel, it'll keep searching.
+
+Although the klogd man pages and source code comments claim that /usr/src/linux is in the search path, I can't find any reference to it. I've reported this to Debian BTS and to Dr. G.W. Wettstein (the author of ksym.c).
+
+
+Device Drivers
+
+System.map isn't just useful for debugging kernel oopses. A few drivers need System.map to resolve symbols since they're linked against kernel headers instead of glibc). They won't work correctly without the System.map for the particular kernel currently running. This is NOT the same thing as a module not loading because of a kernel version mismatch, which has to do with the kernel version, not the kernel symbol table which changes between kernels of the same version!
+
+
+ps
+
+ps uses a different (more general) search array than klogd:
+
+      *sysmap_paths[] = {
+            "/boot/System.map-%s",
+            "/boot/System.map",
+            "/lib/modules/%s/System.map",
+            "/usr/src/linux/System.map",
+            "/System.map",
+            NULL
+      };
+	
+where %s gets replaced by the currently running kernel version.
+
+
+What else uses (or doesn't use) the System.map
+
+At one point (May 2003), I thought that lsof and dosemu used System.map, but from looking at the source code (May 2007) they don't appear to anymore (or perhaps I was mistaken).
+
+
+What Happens If I Don't Have A Healthy System.map?
+
+Suppose you have multiple kernels on the same machine. You need a separate System.map file for each kernel. If you run a kernel with no (or an incorrect) System.map, you'll periodically see annoying warnings like:
+
+System.map does not match actual kernel
+everytime you use ps. Also, your klogd or ksymoops output will not be reliable in case of a kernel oops.
+
+TODO
+
+Look at ps more closely to determine if the man page is really in error, and if so, report it to Debian BTS and the ps maintainers.
+Fix the CSS: my markup sucks ass. I'm really bad at webpage design. Need a better way to distinguish between sections and subsections. Fixed font content should have a smaller a font size.
+
+Acknowledgements
+
+Rickey Page (28 May 2003) for doing my heart good.
+Mauro Giachero (May 2007): Read the klogd source code and determined that the klogd man page and source code comments are wrong about the System.map man page search path. He also provided information about the System.map usage (or lack thereof) of lsof, ps, and dosemu.

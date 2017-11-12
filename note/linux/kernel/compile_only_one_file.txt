@@ -1,0 +1,1 @@
+make sound/soc/codecs/cs4398.i //only preprocessing

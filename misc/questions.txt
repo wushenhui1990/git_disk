@@ -1,0 +1,17 @@
+怎样自动生成文件头
+http://vim.wikia.com/wiki/Category%3aAutomated_Text_Insertion
+
+BIN文件（直接在硬件上运行的程序)跟在LINUX上运行的有什么不同。
+
+taglist 快速高亮
+
+kernel compile section mismatch
+
+vim 自动更新tags
+
+vim 跳转策略
+
+vim 自动补全
+
+
+

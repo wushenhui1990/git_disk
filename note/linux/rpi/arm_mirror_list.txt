@@ -1,0 +1,11 @@
+清华
+
+http://mirrors.tuna.tsinghua.edu.cn/archlinuxarm/$arch/$repo
+
+中科大
+
+http://mirrors.ustc.edu.cn/archlinuxarm/$arch/$repo
+
+成都电子科大
+
+http://mirrors.stuhome.NET/archlinuxarm/$arch/$repo

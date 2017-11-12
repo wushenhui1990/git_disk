@@ -1,0 +1,1 @@
+sudo mount -t cifs -o username=wsh,password=7895123,uid=wsh,gid=wsh //192.168.1.80/E E

@@ -1,0 +1,5 @@
+modify cpu wing throuhold
+
+disable laptop lid close suspend
+
+modify console course attribute

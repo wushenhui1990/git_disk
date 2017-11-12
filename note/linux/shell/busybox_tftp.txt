@@ -1,0 +1,1 @@
+tftp -g -r filename.txt 20.20.20.1

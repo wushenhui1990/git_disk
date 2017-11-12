@@ -1,0 +1,17 @@
+wget http://pypi.python.org/packages/source/R/RPi.GPIO/RPi.GPIO-0.1.0.tar.gz
+    $ tar zxf RPi.GPIO-0.1.0.tar.gz
+    $ cd RPi.GPIO-0.1.0
+    $ sudo python setup.py install
+	
+	
+	$ sudo python
+    >>> import RPi.GPIO as GPIO
+    >>> GPIO.setup(18, GPIO.OUT)
+    >>> GPIO.output(18, False)
+	
+	
+	>>> GPIO.setup(16, GPIO.OUT)
+
+	
+	>>> GPIO.output(18, True)
+    >>> GPIO.output(16, True)

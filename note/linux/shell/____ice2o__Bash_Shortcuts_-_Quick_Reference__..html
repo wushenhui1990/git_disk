@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<!-- saved from url=(0041)https://www.ice2o.com/bash_quick_ref.html -->
+<html xmlns="\&quot;http://www.w3.org/1999/xhtml\&quot;" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>
+.:: ice2o: Bash Shortcuts - Quick Reference::.
+</title>
+
+
+<meta name="keywords" content="bash, linux, shortcuts, keyboard">
+<meta name="description" content="A quick reference to some of the shortcuts available in a bash login shell.">
+<meta name="author" content="Mike Peters">
+
+<style type="text/css">
+a{font-weight: bold; color: blue; text-decoration: none}
+.menu{margin-right: 20px; margin-left: 20px; color: black; font-size: 8pt; font-weight:500; font-family: Geneva,arial,sans-serif}
+h1{color: black; font-size: 12pt; font-weight: 600; text-align: justify; margin-left: 35px; margin-right: 25px; font-family: Geneva,arial,sans-serif}
+h2{color: black; font-size: 11pt; font-weight: 550; text-align: justify; margin-left: 35px; margin-right: 25px; font-family: Geneva,arial,sans-serif}
+h3{color: black; font-size: 10pt; font-weight: 550; text-align: justify; margin-left: 35px; margin-right: 25px; font-family: Geneva,arial,sans-serif}
+.b{color: black; font-size: 10pt; font-weight: bold; text-align: justify; margin-left: 35px; margin-right: 25px; font-family: Geneva,arial,sans-serif}
+p{font-family: Geneva,arial,sans-serif; font-weight: 450; text-align: justify; margin-left: 35px; margin-right: 25px; font-size: 10pt}
+.code{margin-right: 5px; margin-left: 5px; font-family: courier,arial,sans-serif; font-weight: 350; font-size: 10pt}
+td{ border: solid thin}
+</style>
+
+<style id="style-1-cropbar-clipper">/* Copyright 2014 Evernote Corporation. All rights reserved. */
+.en-markup-crop-options {
+    top: 18px !important;
+    left: 50% !important;
+    margin-left: -100px !important;
+    width: 200px !important;
+    border: 2px rgba(255,255,255,.38) solid !important;
+    border-radius: 4px !important;
+}
+
+.en-markup-crop-options div div:first-of-type {
+    margin-left: 0px !important;
+}
+</style></head>
+
+<body data-pinterest-extension-installed="cr1.37"><table style="background-color: white; font-family: Geneva,arial,sans-serif">
+<tbody><tr style="background-color: #c7c7c7">
+	<td style="text-align: center; font-weight: 600" colspan="2">
+	Bash Shortcuts Quick Reference
+	</td>
+</tr>
+<tr>
+	<td width="90">
+	Ctrl-a
+	</td>
+	<td>
+	Move to the start of the line.
+	</td>
+</tr>
+<tr>
+	<td>
+	Ctrl-e
+	</td>
+	<td>
+	Move to the end of the line.
+	</td>
+</tr>
+<tr>
+	<td>
+	Ctrl-b
+	</td>
+	<td>
+	Move back one character.
+	</td>
+</tr>
+<tr>
+	<td>
+	Alt-b
+	</td>
+	<td>
+	Move back one word.
+	</td>
+</tr>
+<tr>
+	<td>
+	Ctrl-f
+	</td>
+	<td>
+	Move forward one character.
+	</td>
+</tr>
+<tr>
+	<td>
+	Alt-f
+	</td>
+	<td>
+	Move forward one word.
+	</td>
+</tr>
+<tr>
+	<td>
+	Ctrl-] <i>x</i>
+	</td>
+	<td>
+	Where x is any character, moves the cursor forward to the next occurance of x.
+	</td>
+</tr>
+<tr>
+	<td>
+	Alt-Ctrl-] <i>x</i>
+	</td>
+	<td>
+	Where x is any character, moves the cursor backwards to the previous occurance of x.
+	</td>
+</tr>
+<tr>
+	<td>
+	Ctrl-u
+	</td>
+	<td>
+	Delete from the cursor to the beginning of the line.
+	</td>
+</tr>
+<tr>
+	<td>
+	Ctrl-k
+	</td>
+	<td>
+	Delete from the cursor to the end of the line.
+	</td>
+</tr>
+<tr>
+	<td>
+	Ctrl-w
+	</td>
+	<td>
+	Delete from the cursor to the start of the word.
+	</td>
+</tr>
+<tr>
+	<td>
+	Esc-Del
+	</td>
+	<td>
+	Delete previous word (may not work, instead try Esc followed by Backspace)
+	</td>
+</tr>
+<tr>
+	<td>
+	Ctrl-y
+	</td>
+	<td>
+	Pastes text from the clipboard.
+	</td>
+</tr>
+<tr>
+	<td>
+	Ctrl-l
+	</td>
+	<td>
+	Clear the screen leaving the current line at the top of the screen.
+	</td>
+</tr>
+<tr>
+	<td>
+	Ctrl-x Ctrl-u
+	</td>
+	<td>
+	Undo the last changes. Ctrl-_ does the same
+	</td>
+</tr>
+<tr>
+	<td>
+	Alt-r
+	</td>
+	<td>
+	Undo all changes to the line.
+	</td>
+</tr>
+<tr>
+	<td>
+	Alt-Ctrl-e
+	</td>
+	<td>
+	Expand command line.
+	</td>
+</tr>
+<tr>
+	<td>
+	Ctrl-r
+	</td>
+	<td>
+	Incremental reverse search of history.
+	</td>
+</tr>
+<tr>
+	<td>
+	Alt-p
+	</td>
+	<td>
+	Non-incremental reverse search of history.
+	</td>
+</tr>
+<tr>
+	<td>
+	!!
+	</td>
+	<td>
+	Execute last command in history
+	</td>
+</tr>
+<tr>
+	<td>
+	!abc
+	</td>
+	<td>
+	Execute last command in history beginning with abc
+	</td>
+</tr>
+<tr>
+	<td>
+	!abc:p
+	</td>
+	<td>
+	Print last command in history beginning with abc
+	</td>
+</tr>
+<tr>
+	<td>
+	!<i>n</i>
+	</td>
+	<td>
+	Execute <i>n</i>th command in history
+	</td>
+</tr>
+<tr>
+	<td>
+	!$
+	</td>
+	<td>
+	Last argument of last command
+	</td>
+</tr>
+<tr>
+	<td>
+	!^
+	</td>
+	<td>
+	First argument of last command
+	</td>
+</tr>
+<tr>
+	<td>
+	^abc^xyz
+	</td>
+	<td>
+	Replace first occurance of abc with xyz in last command and execute it
+	</td>
+</tr>
+
+</tbody></table>
+
+
+
+<audio controls="controls" style="display: none;"></audio></body><style type="text/css">#yddContainer{display:block;font-family:Microsoft YaHei;position:relative;width:100%;height:100%;top:-4px;left:-4px;font-size:12px;border:1px solid}#yddTop{display:block;height:22px}#yddTopBorderlr{display:block;position:static;height:17px;padding:2px 28px;line-height:17px;font-size:12px;color:#5079bb;font-weight:bold;border-style:none solid;border-width:1px}#yddTopBorderlr .ydd-sp{position:absolute;top:2px;height:0;overflow:hidden}.ydd-icon{left:5px;width:17px;padding:0px 0px 0px 0px;padding-top:17px;background-position:-16px -44px}.ydd-close{right:5px;width:16px;padding-top:16px;background-position:left -44px}#yddKeyTitle{float:left;text-decoration:none}#yddMiddle{display:block;margin-bottom:10px}.ydd-tabs{display:block;margin:5px 0;padding:0 5px;height:18px;border-bottom:1px solid}.ydd-tab{display:block;float:left;height:18px;margin:0 5px -1px 0;padding:0 4px;line-height:18px;border:1px solid;border-bottom:none}.ydd-trans-container{display:block;line-height:160%}.ydd-trans-container a{text-decoration:none;}#yddBottom{position:absolute;bottom:0;left:0;width:100%;height:22px;line-height:22px;overflow:hidden;background-position:left -22px}.ydd-padding010{padding:0 10px}#yddWrapper{color:#252525;z-index:10001;background:url(chrome-extension://eopjamdnofihpioajgfdikhhbobonhbb/ab20.png);}#yddContainer{background:#fff;border-color:#4b7598}#yddTopBorderlr{border-color:#f0f8fc}#yddWrapper .ydd-sp{background-image:url(chrome-extension://eopjamdnofihpioajgfdikhhbobonhbb/ydd-sprite.png)}#yddWrapper a,#yddWrapper a:hover,#yddWrapper a:visited{color:#50799b}#yddWrapper .ydd-tabs{color:#959595}.ydd-tabs,.ydd-tab{background:#fff;border-color:#d5e7f3}#yddBottom{color:#363636}#yddWrapper{min-width:250px;max-width:400px;}</style></html>

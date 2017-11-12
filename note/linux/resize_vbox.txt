@@ -1,0 +1,6 @@
+VBoxManage.exe modifyhd "C:\Users\wsh\VirtualBox VMs\arch64\arch64.vdi" --resize 40960
+
+sudo fdisk /dev/sda1
+delete and renew 
+
+sudo resize2fs /dev/sda1

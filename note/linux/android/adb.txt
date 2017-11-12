@@ -1,0 +1,2 @@
+filter: only show select tag and priority.
+adb logcat YourTAGHere:Priority *:S

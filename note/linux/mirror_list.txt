@@ -1,0 +1,11 @@
+清华大学 TUNA 镜像源 金枪鱼
+http://mirrors.tuna.tsinghua.edu.cn/
+
+东软信息学院
+http://mirrors.neusoft.edu.cn/
+
+浙江大学开源镜像站
+http://mirrors.zju.edu.cn/
+
+重庆大学镜像源
+http://mirrors.cqu.edu.cn/
