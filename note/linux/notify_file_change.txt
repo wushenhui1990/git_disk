@@ -1,0 +1,1 @@
+inotifywait -m -e MODIFY -r /path/to/your/directory/to/monitor
