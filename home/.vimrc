@@ -1,7 +1,7 @@
 set tabstop=4
 set shiftwidth=4
 set nu
-:syntax on
+syntax on
 set cindent
 set fileencodings=utf-8,gb18030
 set fileformats=unix,dos
@@ -10,7 +10,6 @@ set hlsearch "keep highlight search ,:nohl to mute
 set laststatus=2
 set statusline=%F "let status line show full path
 set statusline+=%m "modify flag
-set autowrite
 set hidden "keep undolist 
 set undodir=~/.vim/undo
 set tags=tags
@@ -27,7 +26,8 @@ let g:ycm_show_diagnostics_ui=0
 let g:ycm_autoclose_preview_window_after_completion=1
 set updatetime=1000
 colo desert
-:au FocusLost * silent! wa
+au FocusLost * silent! wa
+set autowrite
 
 so ~/.vim/functions/add_title.vim
 nnoremap <silent> <F4> :call AddTitle()<CR>

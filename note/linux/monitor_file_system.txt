@@ -1,0 +1,4 @@
+inotifywait -m -e MODIFY -r /path/to/your/directory/to/monitor
+
+ output the PID of the process doing the MODIFY
+file=$(inotifywait -r /home/mang/watch --format %w | sed 's/.$//'); lsof | grep $file

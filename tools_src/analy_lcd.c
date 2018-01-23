@@ -5,17 +5,15 @@
 
 /* analy lcd data in csv file genrate by saleae(USB logic analyze)*/
 
+#define DATA_BITS 8
 struct lcd_raw_data
 {
 	double time_stamp;
-    char data[9];
+    char data[DATA_BITS];
     char cs;
     char cd;
     char wr;
     char rd;
-    char reset;
-    char backlight;
-    char voltage;
 }lcd_raw_data;
 
 static struct lcd_raw_data *raw_data_buf;
@@ -27,12 +25,27 @@ static void p_raw_data(void)
     struct lcd_raw_data *rp = raw_data_buf;
     int i;
     for(i=0; i< raw_data_filled; i++){
-    printf("%lf, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", 
+#if (DATA_BITS == 9)
+    printf("%lf, \
+			%d, %d, %d, %d, \
+			%d, %d, %d, %d, \
+			%d, %d, %d, %d, \
+			%d\n", 
             rp->time_stamp, 
             rp->data[0], rp->data[1], rp->data[2], rp->data[3],
             rp->data[4], rp->data[5], rp->data[6], rp->data[7],
             rp->data[8], rp->cs, rp->cd, rp->wr, 
-            rp->rd, rp->reset, rp->backlight, rp->voltage);
+            rp->rd);
+#else
+    printf("%lf, \
+			%d, %d, %d, %d, \
+			%d, %d, %d, %d, \
+			%d, %d, %d, %d\n",
+            rp->time_stamp, 
+            rp->data[0], rp->data[1], rp->data[2], rp->data[3],
+            rp->data[4], rp->data[5], rp->data[6], rp->data[7],
+            rp->cs, rp->cd, rp->wr, rp->rd);
+#endif
     rp++;
     }
 
@@ -66,12 +79,28 @@ static int read_raw_data(char *file_name)
             //printf("%d%%\r", ftell(f_scv)*100/file_len);
         }
         rp = raw_data_buf + raw_data_filled;
-        char_len = fscanf(f_scv, "%lf, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", 
+#if (DATA_BITS == 9)
+        char_len = fscanf(f_scv, "%lf, \
+				%d, %d, %d, %d, \
+				%d, %d, %d, %d, \
+				%d, %d, %d, %d, \
+				%d\n", 
                 &rp->time_stamp, 
                 &rp->data[0], &rp->data[1], &rp->data[2], &rp->data[3],
                 &rp->data[4], &rp->data[5], &rp->data[6], &rp->data[7],
                 &rp->data[8], &rp->cs, &rp->cd, &rp->wr, 
-                &rp->rd, &rp->reset, &rp->backlight, &rp->voltage);
+                &rp->rd);
+#else
+        char_len = fscanf(f_scv, "%lf, \
+				%d, %d, %d, %d,\
+				%d, %d, %d, %d, \
+				%d, %d, %d, %d\n", 
+                &rp->time_stamp, 
+                &rp->data[0], &rp->data[1], &rp->data[2], &rp->data[3],
+                &rp->data[4], &rp->data[5], &rp->data[6], &rp->data[7],
+                &rp->cs, &rp->cd, &rp->wr, &rp->rd);
+
+#endif
         if(char_len <= 0 || char_len == EOF){
             printf("end of file\n");
             break;
@@ -104,23 +133,23 @@ static int get_data(struct lcd_raw_data *lcd)
 {
     int a = 0;
     int i;
-    for(i=0; i<9; i++){
+    for(i=0; i<DATA_BITS; i++){
         a |= (lcd->data[i] << i);
     }
-    //return a;
-    return a >> 1;
+    return a;
+    //return a >> 1;
 }
 
 static int get_data2(struct lcd_raw_data *lcd)
 {
     int a = 0;
     int i;
-    for(i=0; i<9; i++){
+    for(i=0; i<DATA_BITS; i++){
         a |= (lcd->data[i] << i);
     }
     return a;
 }
-#if 1
+#if 0
 static int last_lcd_data;
 static int last_lcd_cd;
 static int lcd_data_count;
@@ -140,7 +169,7 @@ static void lcd_data(struct lcd_raw_data *lcd)
                 printf("count:%d\n", lcd_data_count);
             lcd_data_count = 0;
         }
-        printf("0bit is on%02x\n", get_data2(lcd));
+        //printf("0bit is on%02x\n", get_data2(lcd));
         if(0 == lcd->cd){
             printf("%lf, {SMART_CONFIG_CMD,0x%02x},\n", lcd->time_stamp, data);
         }else{
@@ -152,24 +181,64 @@ static void lcd_data(struct lcd_raw_data *lcd)
 }
 #else
 
-#define TIME_STAMP
+//#define TIME_STAMP
+#define CONVERT_16
+static int char_offset;
+static int lcd_d;
 static void lcd_data(struct lcd_raw_data *lcd)
 {
-    int data = get_data(lcd);
+#ifdef CONVERT_16
+    if(1 == lcd->cd){
+		lcd_d |= (get_data(lcd) << char_offset);
+		char_offset += 8;
+	}else{
+		if(char_offset){
+			//printf("un expect data:0x%04x\n", lcd_d);
+			printf("{SMART_CONFIG_DATA,0x%02x},\n", lcd_d);
+			char_offset = 0;
+		}
+		lcd_d = get_data(lcd);
+	}
+#else
+    lcd_d = get_data(lcd);
+#endif
+
+#ifdef TIME_STAMP
     if(0 == lcd->cd){
-        printf("%lf, {SMART_CONFIG_CMD,0x%02x},\n", lcd->time_stamp, data);
+        printf("%lf, {SMART_CONFIG_CMD,0x%02x},\n", lcd->time_stamp, lcd_d);
     }else{
-        printf("%lf, {SMART_CONFIG_DATA,0x%02x},\n", lcd->time_stamp, data);
+        printf("%lf, {SMART_CONFIG_DATA,0x%02x},\n", lcd->time_stamp, lcd_d);
     }
+#else
+#ifdef CONVERT_16
+    if(0 == lcd->cd){
+        printf("{SMART_CONFIG_CMD,0x%02x},\n", lcd_d);
+		char_offset = 0;
+		lcd_d = 0;
+	}else {
+		if(char_offset == 16){
+			printf("{SMART_CONFIG_DATA,0x%04x},\n", lcd_d);
+			char_offset = 0;
+			lcd_d = 0;
+		}
+	}
+#else
+    if(0 == lcd->cd){
+        printf("{SMART_CONFIG_CMD,0x%02x},\n", lcd_d);
+    }else{
+        printf("{SMART_CONFIG_DATA,0x%02x},\n", lcd_d);
+    }
+#endif
+#endif
 }
 #endif
 
 static void lcd_data2(struct lcd_raw_data *lcd)
 {
     if(0 == lcd->cd){
-        printf("{SMART_CONFIG_CMD,0x%02x},\n", get_data(lcd));
+        printf("r:{SMART_CONFIG_CMD,0x%02x},\n", get_data(lcd));
     }else{
-        printf("{SMART_CONFIG_DATA,0x%02x},\n", get_data(lcd));
+        printf("r:{SMART_CONFIG_DATA,0x%02x},\n", get_data(lcd));
     }
 }
 static int parse_lcd(void)
@@ -181,12 +250,11 @@ static int parse_lcd(void)
         //judge_delay(*rd0, *rd1);
         //if(rd0->time_stamp > 9.138)
          //   break;
-        if(1 == rd0->reset && 1 == rd1->reset &&
-            0 == rd1->cs){
+        if(0 == rd1->cs){
             if(0 == rd0->wr && 1 == rd1->wr){
                 lcd_data(rd1);
             }else if(0 == rd0->rd && 1 == rd1->rd){
-                //lcd_data2(rd1);
+                lcd_data2(rd1);
             }
         }
         rd0++;

@@ -1,0 +1,5 @@
+[-Wcpp]
+#ifdef __vax__
+#error "Won't work on VAXen.  See comments at get_last_object."
+#warning "Won't work on VAXen.  See comments at get_last_object."
+#endif

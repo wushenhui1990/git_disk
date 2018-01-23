@@ -7,7 +7,7 @@
 HISTSIZE=2000000
 HISTFILESIZE=2000000
 
-PATH=$PATH:~/mybin
+PATH=~/git_disk/bin:~/git_disk/sh:$PATH
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'

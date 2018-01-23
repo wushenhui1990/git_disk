@@ -27,3 +27,76 @@ grep abc 当前目录下除kernel外所有目录的.c,.cpp文件
 find `ls |grep -v kernel` -regex '.*.\(c\|cpp\)' |xargs grep "abc" -s
 
 
+
+取出路径中文件名
+filename=$(basename "$fullfile")
+extension="${filename##*.}"
+filename="${filename%.*}"
+filename="${fullfile##*/}"
+
+~% FILE="example.tar.gz"
+~% echo "${FILE%%.*}"
+example
+~% echo "${FILE%.*}"
+example.tar
+~% echo "${FILE#*.}"
+tar.gz
+~% echo "${FILE##*.}"
+gz
+
+
+---------------------------------------------------------------------------------
+cut path
+
+path=/path/to/file/drive/file/path/
+echo ${path#/path/to/file/drive/} = file/path/
+The #.. part strips off a leading matching string when the variable is expanded;
+
+if path=/home/dude/some/deepish/dir
+
+# (Add 2 to the number of components to remove to get the value to pass to -f)
+$ echo $path | cut -d'/' -f4-
+some/deepish/dir
+To keep the first two components:
+
+$ echo $path | cut -d'/' -f-3
+/home/dude
+To remove the last two components (rev reverses the string):
+
+$ echo $path | rev | cut -d'/' -f4- | rev
+/home/dude/some
+To keep the last three components:
+
+$ echo $path | rev | cut -d'/' -f-3 | rev
+some/deepish/dir
+Or, if you want to remove everything before a particular component, sed would work:
+
+$ echo $path | sed 's/.*\(some\)/\1/g'
+some/deepish/dir
+Or after a particular component:
+
+$ echo $path | sed 's/\(dude\).*/\1/g'
+/home/dude
+It's even easier if you don't want to keep the component you're specifying:
+
+$ echo $path | sed 's/some.*//g'
+/home/dude/
+And if you want to be consistent you can match the trailing slash too:
+
+$ echo $path | sed 's/\/some.*//g'
+/home/dude
+Of course, if you're matching several slashes, you should switch the sed delimiter:
+
+$ echo $path | sed 's!/some.*!!g'
+/home/dude
+Note that these examples all use absolute paths, you'll have to play around to make them work with relative paths.
+--------------------------------------------------------------------------------------------------
+
+show command run in script 
+
+Use set +x and set +v to turn off the above settings.
+
+On the first line of the script, one can put #!/bin/sh -x to have the same effect as set -x later in the script.
+
+----------------------------------------------------------------------------------------------------
+

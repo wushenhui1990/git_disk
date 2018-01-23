@@ -2,6 +2,10 @@ mount -t cifs -o username=public,password=public //192.168.1.10/public mnt/
 
 mount -t cifs -o username=wsh,password=7895123,sec=ntlm //192.168.1.80/music mnt
 
+not root mount
 mount -t cifs -o username=wsh,password=7895123,sec=ntlm,uid=wsh,gid=wsh //192.168.1.80/music mnt
 
 smbclient -L 192.168.1.80 list dir
+
+not root mount 
+sudo mount.cifs //192.168.1.80/music my_pc -o user=wsh,pass=7895123,uid=wsh

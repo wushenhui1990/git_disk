@@ -1,0 +1,3 @@
+extern dynamic vid:
+in win:  VBoxManage.exe modifyhd "d:arch642.vdi" --resize 61400
+in linux: resize2fs /dev/sda1

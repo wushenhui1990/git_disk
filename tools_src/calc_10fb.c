@@ -42,7 +42,7 @@ int main(void)
 	{
 		for(i=0; i<=32; i++)
 		{
-			//fb= ( (rates[j] <<14)/1000) + (i-16)*most_fb[j];
+			//fb= ( (rates[j] + (i-16)*most_fb[j])<<16)/8000; //2.0
 			fb= ( (rates[j] + (i-16)*most_fb[j])<<14)/1000;
 			fb_val[j][i] = fb;
 			printf("rate:%lld,i:%d,fb:%08x\n",rates[j],i,fb);
