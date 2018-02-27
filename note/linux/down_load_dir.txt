@@ -1,0 +1,35 @@
+----------------------wget way-------------------------
+wget -m -nH --cut-dirs=1 -np -R 'index.*' http://example.com/folder1/folder2/
+-m, --mirror: download recursively everything
+-nH, --no-host-directories: do not put the data inside a directory named with the host name
+--cut-dirs=1: skip the first directory when creating the local hierarchy
+-np, --no-parent: do not fetch the parents!
+-R, --reject 'index.*': do not save files named like "index.*"
+Might be useful: -e robots=off to tell wget to ignore your robots.txt.
+
+$ wget -m -nH --cut-dirs=4 -np --reject 'index.*' \
+ http://ftp.lip6.fr/pub/linux/distributions/slackware/slackware64-current/source/a/bin/
+$ tree
+.
+└── slackware64-current/
+    └── source/
+        └── a/
+            └── bin/
+                ├── banners.tar.gz
+                ├── bin.SlackBuild
+                ├── debianutils_2.7.dsc
+                ├── debianutils_2.7.tar.gz
+                ├── fbset-2.1.tar.gz
+                ├── scripts/
+                │   ├── diskcopy.gz
+                │   └── xx.gz
+                ├── slack-desc
+                └── todos.tar.gz
+
+
+
+-------------------------lftp way------------------------------
+download http://www.example.com/folder1/folder2/
+
+
+lftp -c "open http://example.com/folder1/; mirror folder2"
