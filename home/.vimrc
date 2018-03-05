@@ -28,6 +28,8 @@ set updatetime=1000
 colo desert
 au FocusLost * silent! wa
 set autowrite
+"yank to system clipboard,request "vim --version +clipboard or +xterm_clipboard
+set clipboard=unnamed
 
 so ~/.vim/functions/add_title.vim
 nnoremap <silent> <F4> :call AddTitle()<CR>
@@ -74,8 +76,12 @@ nnoremap [i :[I "show all tags
 nnoremap <C-g> 1<C-g> "show full path
 nnoremap <C-p> diw"0P
 nnoremap <C-]> <C-]>zz
+
+"reselect last visual select
 nnoremap <Leader>s `>V`<
-xnoremap p "_dP
+
+"yank select char to null and past
+xnoremap p "_dP 
 
 nnoremap <Leader>e :e <C-R>=expand('%:p:h') . '/'<CR>
 nnoremap <Leader>n :grep! "<C-r>=expand('%:t')<CR>" <C-R>=expand('%:p:h') . '/*'<CR> -nr
