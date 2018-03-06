@@ -10,6 +10,8 @@ char *fun_begin[]={
 	"short",
 	"long",
 	"unsigned",
+	"ssize_t",
+	"size_t",
 	NULL,
 };
 
