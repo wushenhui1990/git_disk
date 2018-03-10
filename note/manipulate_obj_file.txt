@@ -1,0 +1,3 @@
+
+print and sort ro data size on obj
+ nm --print-size --size-sort --radix=d targets/smbgetshare |grep " r " -i

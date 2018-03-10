@@ -10,23 +10,35 @@ char *fun_begin[]={
 	"short",
 	"long",
 	"unsigned",
+	"struct",
+	"enum",
 	"ssize_t",
 	"size_t",
 	NULL,
 };
 
+char *fun_type_prev[] ={
+	"const static",
+	"static",
+	"const",
+	"unsigned",
+	NULL,
+};
 
-char *strrstr(char *src, int src_revert_size, char *find, char find_size)
+char *strrstr_fun_type(char *src, int src_revert_size, char *find, char find_size)
 {
 	int i;
-	char static_str[] = "static ";
-	//printf("find :%s, size:%d\n", find, find_size);
 	for(i=find_size; i<src_revert_size; i++){
 		char trial = *(src-i+find_size );
-		if(strncmp(src-i, find, find_size) == 0 &&(trial == ' ' || trial == '\n')){
+		char pre = *(src - i - 1);
+		if(strncmp(src-i, find, find_size) == 0 && (trial == ' ' || trial == '\n') &&
+				(pre == ' ' || pre == '\n')){
 			break;
 		}
-		if(*(src - i) == '}' || *(src - i) == ';'){
+		if(*(src - i) == '}' || *(src - i) == ';' || *(src - i) == '"' ||
+				*(src - i) == '{' || *(src-i) == ')' || *(src - i) == '(' ||
+				*(src - i) == '*' || *(src-i) == '/' || *(src - i) == '\\' ||
+				( *(src-i) == '\n' &&  pre == '\n') ){
 
 			return NULL;
 		}
@@ -35,54 +47,85 @@ char *strrstr(char *src, int src_revert_size, char *find, char find_size)
 	if(i >= src_revert_size){
 		return NULL;
 	}
-	if(src_revert_size - i > strlen(static_str)){
-		if(strncmp((char*)(src - i - strlen(static_str)), static_str, strlen(static_str)) == 0){
-			return src - i - strlen(static_str);
-		}
-	}
-
 
 	//printf(" fn start:%p\n", src - i);
 	return src - i;
 
 }
 
-int del_fun(char *file_buf, int size, char *fun_name)
+
+char *find_fun_type_p(char *need_find_str, int revert_size, char *find_char[])
 {
-	char *fun_name_p;
-	char *fun_start_p = NULL;
 	int i = 0;
+	char *find_char_p = NULL;
+	while(1){
+		if(find_char[i] == NULL){
+			break;
+		}
+		find_char_p	= strrstr_fun_type(need_find_str, revert_size, find_char[i], strlen(find_char[i]));
+		if(find_char_p){
+			break;
+		}
+		i++;
+	}
+	return find_char_p;
+}
+
+char *strrstr_fun_type_prev(char *src, int src_revert_size, char *find, char find_size)
+{
+	int i;
+	for(i=find_size; i<src_revert_size; i++){
+		char trial = *(src-i+find_size );
+		char pre = *(src - i - 1);
+		//if(pre != ' ' && pre != '\n')
+		//	return NULL;
+		if(strncmp(src-i, find, find_size) == 0 && (trial == ' ' || trial == '\n') &&
+				(pre == ' ' || pre == '\n')){
+			break;
+		}
+		if(*(src - i) == '}' || *(src - i) == ';' || *(src - i) == '"' ||
+				( *(src-i) == '\n' &&  pre == '\n') ){
+
+			return NULL;
+		}
+	}
+
+	if(i >= src_revert_size){
+		return NULL;
+	}
+
+	//printf(" fn start:%p\n", src - i);
+	return src - i;
+
+}
+char *find_fun_type_prev_p(char *need_find_str, int revert_size, char *find_char[])
+{
+	int i = 0;
+	char *find_char_p = NULL;
+	while(1){
+		if(find_char[i] == NULL){
+			break;
+		}
+		find_char_p	= strrstr_fun_type_prev(need_find_str, revert_size, find_char[i], strlen(find_char[i]));
+		if(find_char_p){
+			break;
+		}
+		i++;
+	}
+	return find_char_p;
+}
+
+int find_pattern(char *buf, char **l_p, char l, char **r_p, char r)
+{
 	int pattern_l_count = 0;
 	char *pattern_l_p;
 	int pattern_r_count = 0;
 	char *pattern_r_p;
 
-	fun_name_p = strstr(file_buf, fun_name);
-	
-	if(fun_name_p){
-		while(1){
-			if(fun_begin[i] == NULL){
-				break;
-			}
-			fun_start_p	= strrstr(fun_name_p, fun_name_p - file_buf, fun_begin[i], strlen(fun_begin[i]));
-			if(fun_start_p){
-				break;
-			}
-			i++;
-		}
-	}else{
-		printf("find fun mane error\n");
-		return -1;
-	}
-
-	if(!fun_start_p){
-		printf("find fun start error\n");
-		return -1;
-	}
 	pattern_l_count = 0;
 	pattern_r_count = 0;
 	
-	pattern_l_p = strchr(fun_name_p, '{');
+	pattern_l_p = strchr(buf, l);
 	if(!pattern_l_p){
 		printf("find pattern l error\n");
 		return -1;
@@ -91,9 +134,9 @@ int del_fun(char *file_buf, int size, char *fun_name)
 
 	pattern_r_p = pattern_l_p;
 	while(1){
-		pattern_l_p = strchr(pattern_l_p+1, '{');
+		pattern_l_p = strchr(pattern_l_p+1, l);
 
-		pattern_r_p = strchr(pattern_r_p+1, '}');
+		pattern_r_p = strchr(pattern_r_p+1, r);
 
 		if(pattern_l_p != NULL && pattern_l_p < pattern_r_p ){
 			pattern_l_count++;
@@ -109,13 +152,66 @@ int del_fun(char *file_buf, int size, char *fun_name)
 			break;
 		}
 	}
+
+	*l_p = pattern_l_p;
+	*r_p = pattern_r_p;
+	return 0;
+}
+
+int del_fun(char *file_buf, int size, char *fun_name)
+{
+	char *fun_name_p;
+	char *fun_start_p = NULL;
+	char *pattern_l_p;
+	char *pattern_r_p;
+
+	fun_name_p = strstr(file_buf, fun_name);
 	
-	int fun_size = pattern_r_p - fun_start_p;
+	if(fun_name_p){
+		char *temp_p;
+		temp_p	= find_fun_type_p(fun_name_p, fun_name_p - file_buf, fun_begin);
+		if(temp_p){
+			fun_start_p = temp_p;
+			temp_p	= find_fun_type_prev_p(fun_name_p, fun_name_p - file_buf, fun_type_prev);
+			if(temp_p)
+				fun_start_p = temp_p;
+		}else{
+			printf("find fun start err\n");
+			return -1;
+		}
+	}else{
+		printf("find fun name error\n");
+		return -1;
+	}
+
+	if(!fun_start_p){
+		printf("find fun start error\n");
+		return -1;
+	}
+
+	if(find_pattern(fun_name_p, &pattern_l_p, '(', &pattern_r_p, ')') == 0){
+		if( *(pattern_r_p + 1) == ';'){ //declare
+			pattern_r_p += 1;
+		}else{
+			if(find_pattern(pattern_r_p, &pattern_l_p, '{', &pattern_r_p, '}') == 0){
+			}else{
+				printf("find pattern { error\n");
+				return -1;
+			}
+		}
+	}else{
+		printf("find pattern ( error\n");
+		return -1;
+	}
+	
+	
+	int fun_size = pattern_r_p - fun_start_p + 1;
 	int left_size = (file_buf + size) - pattern_r_p;
 	memcpy(fun_start_p, pattern_r_p+1, left_size);
 	memset(file_buf + size - fun_size, 0, fun_size);
 
 	printf("%s\n", file_buf);
+	return 0;
 }
 
 int main(int argc, char *argv[])
@@ -154,10 +250,10 @@ int main(int argc, char *argv[])
 
 	fclose(fd);
 
-	del_fun(file_buf, size, argv[1]);
+	ret = del_fun(file_buf, size, argv[1]);
 
 	free(file_buf);
 
-	return 0;
+	return ret;
 
 }
