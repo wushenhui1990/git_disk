@@ -1,0 +1,13 @@
+I simply run
+
+$ unzip -O <encoding> <filename> -d <target_dir>
+or
+
+$ unzip -I <encoding> <filename> -d <target_dir>
+choosing between -O or -I according to instructions here:
+
+$ unzip -h
+UnZip 6.00 of 20 April 2009, by Debian. Original by Info-ZIP.
+  ...
+  -O CHARSET  specify a character encoding for DOS, Windows and OS/2 archives
+  -I CHARSET  specify a character encoding for UNIX and other archives

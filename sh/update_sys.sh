@@ -1,0 +1,1 @@
+yaourt -Syu --aur --noconfirm
