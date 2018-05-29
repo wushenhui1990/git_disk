@@ -91,6 +91,11 @@ nnoremap SQ <ESC>:mksession! .vim_session<CR>:wqa<CR>
 inoremap +pk <ESC>:read ~/.vim/template/debug_printk<CR>
 inoremap +pf <ESC>:read ~/.vim/template/debug_printf<CR>
 inoremap +t <ESC>:pu=strftime('%Y/%m/%d %T')<CR>
-au FilterWritePost * if &diff | set t_Co=256 | set bg=dark | else | colorscheme molokai | endif
+if &diff
+    colorscheme my_color
+endif
+au FilterWritePre * if &diff | colorscheme my_color | endif
+
+"au FilterWritePost * if &diff | set t_Co=256 | set bg=dark | else | colorscheme molokai | endif
 "au FilterWritePost * if &diff | set t_Co=256 | set bg=dark | colorscheme peaksea | else | colorscheme molokai | endif
 "au BufWinLeave * colorscheme molokai
