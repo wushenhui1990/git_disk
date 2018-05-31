@@ -1,5 +1,6 @@
 #!/bin/bash
-if [ "$#" < 2 ];then
+if [ $# -le 2 ];then
+echo "args: $#"
 echo "str1, str2, [path]"
 echo "str1 > str2, in path/or cur path if not set"
 exit 0
