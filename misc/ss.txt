@@ -1,0 +1,22 @@
+Wo1.jjj123.com 
+wshwshwshwsh
+55522
+
+ip :167.160.191.135
+port: 61236 
+pass:wsh7895123
+
+
+myvps:
+
+ssh :69.171.69.219  27888
+root wsh3533178
+wsh wsh123
+
+sserver: 69.171.69.219 61236 wsh123
+
+
+kaiyun:
+52.220.216.161
+passwd:1f1-4ud10
+port 443
