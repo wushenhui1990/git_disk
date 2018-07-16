@@ -94,4 +94,6 @@ inoremap +t <ESC>:pu=strftime('%Y/%m/%d %T')<CR>
 if &diff
 	:syntax off
 endif
+
+autocmd BufRead,BufNewFile *.xc set filetype=xc "add file type detect, syntax file is in ~/.vim/syntax; rf :h new-filetype , :h syntax
 "au FilterWritePre * if &diff | colorscheme my_color | endif
