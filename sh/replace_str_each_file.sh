@@ -13,7 +13,7 @@ else
 FPATH=.
 fi
 
-find $FPATH |while read line;do
+find $FPATH | while read line;do
     grep -s -q $1 $line 
     if [ $? == 0 ]; then
     echo replace $line

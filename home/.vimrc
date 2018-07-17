@@ -17,6 +17,7 @@ set tags+=~/.vim/tags
 set tags+=my_tags
 set wrapscan
 set pastetoggle=<F9>
+set conceallevel=0 "let vim not auto convert -> to chinese view
 "set grepprg=grep\ --color=always\ -n\ $*\ /dev/null
 let g:netrw_liststyle=1
 let Tlist_WinWidth=40
