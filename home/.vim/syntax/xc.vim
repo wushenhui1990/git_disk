@@ -17,7 +17,7 @@ else
   unlet b:current_syntax
 endif
 
-setlocal conceallevel=2
+"setlocal conceallevel=2
 setlocal concealcursor=nv
 
 syn clear cUserCont

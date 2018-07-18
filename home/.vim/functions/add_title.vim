@@ -1,6 +1,6 @@
 function AddTitle()
     call append(0,"/*******************************************************************************")
-    call append(1,"     Copyright SmartAction Tech. ".strftime("%Y"))
+    call append(1,"     Copyright kaiyun. ".strftime("%Y"))
     call append(2,"     All Rights Reserved.")
     call append(3,"")
     call append(4,"     File: ".expand("%:t"))

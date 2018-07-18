@@ -398,6 +398,10 @@ let s:tlist_def_beta_settings = 'beta;f:fragment;s:slot;v:pattern'
 let s:tlist_def_c_settings = 'c;d:macro;g:enum;s:struct;u:union;t:typedef;' .
                            \ 'v:variable;f:function'
 
+" xc language
+let s:tlist_def_xc_settings = 'c;d:macro;g:enum;s:struct;u:union;t:typedef;' .
+                           \ 'v:variable;f:function'
+
 " c++ language
 let s:tlist_def_cpp_settings = 'c++;n:namespace;v:variable;d:macro;t:typedef;' .
                              \ 'c:class;g:enum;s:struct;u:union;f:function'
