@@ -2,7 +2,8 @@ set tabstop=4
 set shiftwidth=4
 set nu
 syntax on
-set cindent
+"set cindent
+set autoindent
 set fileencodings=utf-8,gb18030
 set fileformats=unix,dos
 set incsearch "highlight search, realtime search
@@ -27,7 +28,7 @@ let g:ycm_show_diagnostics_ui=0
 let g:ycm_autoclose_preview_window_after_completion=1
 set updatetime=1000
 colo desert
-au FocusLost * silent! wa
+au BufLeave * silent! wa
 set autowrite
 "yank to system clipboard,request "vim --version +clipboard or +xterm_clipboard
 set clipboard=unnamed
@@ -35,9 +36,10 @@ set clipboard=unnamed
 so ~/.vim/functions/add_title.vim
 nnoremap <silent> <F4> :call AddTitle()<CR>
 
+
 nnoremap <silent> <F7> :cw<CR>
 nnoremap <silent> <F8> :TlistOpen<CR>
-nnoremap <silent> <F5> :!ctags -R<CR>
+nnoremap <silent> <F5> :!ctags --c-kinds=+px --langmap=c:+.xc -R<CR>
 
 nnoremap <silent> [b :bprevious<CR>
 nnoremap <silent> ]b :bnext<CR>
@@ -96,5 +98,8 @@ if &diff
 	:syntax off
 endif
 
-autocmd BufRead,BufNewFile *.xc set filetype=xc "add file type detect, syntax file is in ~/.vim/syntax; rf :h new-filetype , :h syntax
+so ~/.vim/functions/xc_fun.vim
+autocmd BufRead,BufNewFile *.xc  call Xc_fun() "add file type detect, syntax file is in ~/.vim/syntax; rf :h new-filetype , :h syntax
+autocmd BufRead,BufNewFile *.xml  nnoremap <Leader>c :F<a!--<ESC>f>i--<ESC>
+autocmd BufRead,BufNewFile *.xn  nnoremap <Leader>c :F<a!--<ESC>f>i--<ESC>
 "au FilterWritePre * if &diff | colorscheme my_color | endif
