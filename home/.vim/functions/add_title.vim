@@ -8,7 +8,7 @@ function AddTitle()
     call append(6,"     Description:")
     call append(7,"")
     call append(8,"     TIME LIST:")
-    call append(9,"     Create by wsh   ".strftime("%Y-%m-%d %H:%M"))
+    call append(9,"     Create by sandy   ".strftime("%Y-%m-%d %H:%M"))
     call append(10,"*******************************************************************************/")
     echohl WarningMsg | echo "Successful in adding the copyright." | echohl None
 endfunction
