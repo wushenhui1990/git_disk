@@ -51,9 +51,7 @@ nnoremap <silent> ]q :cnext<CR>
 nnoremap <silent> [Q :cfirst<CR>
 nnoremap <silent> ]Q :clast<CR>
 nnoremap <silent> ]Q :clast<CR>
-nnoremap <C-n> :nohl<CR>
 nnoremap <Leader>b :b #<CR>
-nnoremap <C-l> :ls<CR>:b 
 nnoremap <S-tab> :tabnex<CR> 
 "nnoremap <tab> :tabnex<CR> 
 
@@ -76,12 +74,15 @@ nnoremap <Leader>q <C-w>j<C-w>l<C-w>q
 "nnoremap ## I#<ESC>
 nnoremap <Leader>d :bprevious<CR>:bdelete #<CR>
 nnoremap [i :[I "show all tags
-nnoremap <C-g> 1<C-g> "show full path
-nnoremap <C-p> diw"0P
-nnoremap <C-]> <C-]>zz
 
 "reselect last visual select
 nnoremap <Leader>s `>V`<
+
+nnoremap <C-n> :nohl<CR>
+nnoremap <C-l> :ls<CR>:b 
+nnoremap <C-g> 1<C-g> "show full path
+nnoremap <C-p> diw"0P
+nnoremap <C-]> <C-]>zz
 
 "yank select char to null and past
 xnoremap p "_dP 
@@ -103,3 +104,8 @@ autocmd BufRead,BufNewFile *.xc  call Xc_fun() "add file type detect, syntax fil
 autocmd BufRead,BufNewFile *.xml  nnoremap <Leader>c :F<a!--<ESC>f>i--<ESC>
 autocmd BufRead,BufNewFile *.xn  nnoremap <Leader>c :F<a!--<ESC>f>i--<ESC>
 "au FilterWritePre * if &diff | colorscheme my_color | endif
+"
+
+let g:jedi#goto_assignments_command = "<Leader>a"
+let g:jedi#rename_command = ''
+let g:jedi#goto_command = "<C-]>"

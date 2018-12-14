@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#define USB20
 unsigned long long rates[]=
 {
 	11025,
@@ -14,6 +15,9 @@ unsigned long long rates[]=
 	176400,
 	192000,
 	352800,
+	384000,
+	352800 * 2,
+	384000 * 2,
 };
 
 #define RATE_NUM (sizeof(rates)/sizeof(rates[0]))
@@ -30,10 +34,15 @@ long long most_fb[]=
 	1,
 	1,
 	1,
+
+	2,
+	2,
+	2,
 	2,
 	2,
 	2,
 };
+
 int main(void)
 {
 	unsigned long long fb;
@@ -42,8 +51,11 @@ int main(void)
 	{
 		for(i=0; i<=32; i++)
 		{
-			//fb= ( (rates[j] + (i-16)*most_fb[j])<<16)/8000; //2.0
+			#ifdef USB20
+			fb= ( (rates[j] + (i-16)*most_fb[j])<<16)/8000; //2.0
+			#else
 			fb= ( (rates[j] + (i-16)*most_fb[j])<<14)/1000;
+			#endif
 			fb_val[j][i] = fb;
 			printf("rate:%lld,i:%d,fb:%08x\n",rates[j],i,fb);
 
