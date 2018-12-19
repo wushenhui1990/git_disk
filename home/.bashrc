@@ -131,3 +131,5 @@ alias egrep='egrep --color=auto'
 alias svndiff='svn diff|colordiff|less -r'
 #cd X1000/platform
 #source tools/build/source.sh
+
+source ~/xTIMEcomposer/Community_14.3.3/SetEnv
