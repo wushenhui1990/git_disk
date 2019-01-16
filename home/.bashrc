@@ -133,3 +133,4 @@ alias svndiff='svn diff|colordiff|less -r'
 #source tools/build/source.sh
 
 source ~/xTIMEcomposer/Community_14.3.3/SetEnv
+export HISTTIMEFORMAT="%d/%m/%y %T "
