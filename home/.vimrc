@@ -31,6 +31,7 @@ filetype plugin indent on    " required
 " see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
 
+set backspace=indent,eol,start
 set tabstop=4
 set shiftwidth=4
 set nu
@@ -56,8 +57,8 @@ set conceallevel=0 "let vim not auto convert -> to chinese view
 let g:netrw_liststyle=1
 let Tlist_WinWidth=40
 let Tlist_Show_One_File=1
-let g:ycm_enable_diagnostic_signs=0
-let g:ycm_show_diagnostics_ui=0
+let g:ycm_enable_diagnostic_signs=1
+let g:ycm_show_diagnostics_ui=1
 let g:ycm_autoclose_preview_window_after_completion=1
 set updatetime=1000
 colo desert
@@ -88,12 +89,12 @@ nnoremap <Leader>b :b #<CR>
 nnoremap <S-tab> :tabnex<CR> 
 "nnoremap <tab> :tabnex<CR> 
 
-nnoremap <Leader>g yiw:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> -nr
-nnoremap <Leader>G yiwq:igrep! <C-r>" * -nr<ESC>
-vnoremap <Leader>g yq:igrep! "<C-r>"" <C-R>=expand('%:p:h') . '/*'<CR> -nr
-vnoremap <Leader>G yq:igrep! "<C-r>"" * -nr<ESC>
+nnoremap <Leader>g yiw:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> -Inr
+nnoremap <Leader>G yiwq:igrep! <C-r>" * -Inr<ESC>
+vnoremap <Leader>g yq:igrep! "<C-r>"" <C-R>=expand('%:p:h') . '/*'<CR> -Inr
+vnoremap <Leader>G yq:igrep! "<C-r>"" * -Inr<ESC>
 
-nnoremap <Leader>t <C-w>hyiw<C-w>l:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> -nr
+nnoremap <Leader>t <C-w>hyiw<C-w>l:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> -Inr
 nnoremap <silent> <C-]> g<C-]>
 nnoremap <Leader>f [[b%b
 nnoremap <Leader>z [{v%zf
