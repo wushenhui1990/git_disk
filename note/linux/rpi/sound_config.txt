@@ -1,0 +1,15 @@
+sudo apt-get install alsa-utils
+sudo modprobe snd-bcm2835
+
+amixer cset numid=3 N
+N should be replaced with the following: 0=auto, 1=analog, 2=hdmi
+
+
+
+
+speaker-test -t wav -c 2
+
+
+/boot/config.txt
+dtparam=audio=on
+audio_pwm_mode=2
