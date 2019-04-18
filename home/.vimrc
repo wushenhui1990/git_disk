@@ -12,9 +12,9 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 
 " Keep Plugin commands between vundle#begin/end.
-Plugin 'davidhalter/jedi-vim'
+"Plugin 'davidhalter/jedi-vim'
 
-Plugin 'Valloric/YouCompleteMe'
+"Plugin 'Valloric/YouCompleteMe'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -35,6 +35,7 @@ set backspace=indent,eol,start
 set tabstop=4
 set shiftwidth=4
 set nu
+set expandtab "tab turn to space
 syntax on
 "set cindent
 set autoindent
@@ -89,9 +90,9 @@ nnoremap <Leader>b :b #<CR>
 nnoremap <S-tab> :tabnex<CR> 
 "nnoremap <tab> :tabnex<CR> 
 
-nnoremap <Leader>g yiw:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> -Inr
+nnoremap <Leader>g yiw:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> --exclude=tags -Inr
 nnoremap <Leader>G yiwq:igrep! <C-r>" * -Inr<ESC>
-vnoremap <Leader>g yq:igrep! "<C-r>"" <C-R>=expand('%:p:h') . '/*'<CR> -Inr
+vnoremap <Leader>g y:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> --exclude=tags -Inr
 vnoremap <Leader>G yq:igrep! "<C-r>"" * -Inr<ESC>
 
 nnoremap <Leader>t <C-w>hyiw<C-w>l:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> -Inr
@@ -137,9 +138,11 @@ so ~/.vim/functions/xc_fun.vim
 autocmd BufRead,BufNewFile *.xc  call Xc_fun() "add file type detect, syntax file is in ~/.vim/syntax; rf :h new-filetype , :h syntax
 autocmd BufRead,BufNewFile *.xml  nnoremap <Leader>c :F<a!--<ESC>f>i--<ESC>
 autocmd BufRead,BufNewFile *.xn  nnoremap <Leader>c :F<a!--<ESC>f>i--<ESC>
+autocmd BufRead,BufNewFile *.py  set noexpandtab
+autocmd BufRead,BufNewFile *.sh  set noexpandtab
 "au FilterWritePre * if &diff | colorscheme my_color | endif
 "
 
-let g:jedi#goto_assignments_command = "<Leader>a"
-let g:jedi#rename_command = ''
-let g:jedi#goto_command = "<C-]>"
+"let g:jedi#goto_assignments_command = "<Leader>a"
+"let g:jedi#rename_command = ''
+"let g:jedi#goto_command = "<C-]>"
