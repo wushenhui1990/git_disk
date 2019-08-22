@@ -1,0 +1,9 @@
+use perl, not sed and awk.
+perl is more mordon than sed awk.
+
+perl -0777 -pi -e 'cmmand' file.txt
+
+//-0777 put perl in slurp mode, which is need to replace multiline
+// -p print
+// -i inplace replacement
+// -e commane

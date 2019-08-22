@@ -90,12 +90,12 @@ nnoremap <Leader>b :b #<CR>
 nnoremap <S-tab> :tabnex<CR> 
 "nnoremap <tab> :tabnex<CR> 
 
-nnoremap <Leader>g yiw:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> --exclude=tags -Inr
-nnoremap <Leader>G yiwq:igrep! <C-r>" * -Inr<ESC>
-vnoremap <Leader>g y:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> --exclude=tags -Inr
-vnoremap <Leader>G yq:igrep! "<C-r>"" * -Inr<ESC>
+nnoremap <Leader>g yiw:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> -nr
+nnoremap <Leader>G yiwq:igrep! <C-r>" * -nr<ESC>
+vnoremap <Leader>g yq:igrep! "<C-r>"" <C-R>=expand('%:p:h') . '/*'<CR> -nr
+vnoremap <Leader>G yq:igrep! "<C-r>"" * -nr<ESC>
 
-nnoremap <Leader>t <C-w>hyiw<C-w>l:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> -Inr
+nnoremap <Leader>t <C-w>hyiw<C-w>l:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> -nr
 nnoremap <silent> <C-]> g<C-]>
 nnoremap <Leader>f [[b%b
 nnoremap <Leader>z [{v%zf
@@ -138,7 +138,7 @@ so ~/.vim/functions/xc_fun.vim
 autocmd BufRead,BufNewFile *.xc  call Xc_fun() "add file type detect, syntax file is in ~/.vim/syntax; rf :h new-filetype , :h syntax
 autocmd BufRead,BufNewFile *.xml  nnoremap <Leader>c :F<a!--<ESC>f>i--<ESC>
 autocmd BufRead,BufNewFile *.xn  nnoremap <Leader>c :F<a!--<ESC>f>i--<ESC>
-autocmd BufRead,BufNewFile *.py  set noexpandtab
+"autocmd BufRead,BufNewFile *.py  set noexpandtab
 autocmd BufRead,BufNewFile *.sh  set noexpandtab
 "au FilterWritePre * if &diff | colorscheme my_color | endif
 "
