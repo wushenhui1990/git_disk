@@ -11,9 +11,11 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 
+Plugin 'junegunn/vim-easy-align'
 " Keep Plugin commands between vundle#begin/end.
-"Plugin 'davidhalter/jedi-vim'
+Plugin 'davidhalter/jedi-vim'
 
+Plugin 'scrooloose/nerdcommenter'
 "Plugin 'Valloric/YouCompleteMe'
 
 " All of your Plugins must be added before the following line
@@ -30,11 +32,13 @@ filetype plugin indent on    " required
 "
 " see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
+"
 
 set backspace=indent,eol,start
 set tabstop=4
 set shiftwidth=4
 set nu
+set sc "show selected line num
 set expandtab "tab turn to space
 syntax on
 "set cindent
@@ -51,13 +55,16 @@ set undodir=~/.vim/undo
 set tags=tags
 set tags+=~/.vim/tags
 set tags+=my_tags
+set complete=.,s,b,u,i "complete only scan the current buffer, see help 'complete'
 set wrapscan
+"set wildmode=longest "tab complete filename
 set pastetoggle=<F9>
 set conceallevel=0 "let vim not auto convert -> to chinese view
 "set grepprg=grep\ --color=always\ -n\ $*\ /dev/null
 let g:netrw_liststyle=1
 let Tlist_WinWidth=40
 let Tlist_Show_One_File=1
+let Tlist_Enable_Fold_Column=0
 let g:ycm_enable_diagnostic_signs=1
 let g:ycm_show_diagnostics_ui=1
 let g:ycm_autoclose_preview_window_after_completion=1
@@ -72,6 +79,11 @@ so ~/.vim/functions/add_title.vim
 nnoremap <silent> <F4> :call AddTitle()<CR>
 
 
+" Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap <Leader>a <Plug>(EasyAlign)
+
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap <Leader>a <Plug>(EasyAlign)
 nnoremap <silent> <F7> :cw<CR>
 nnoremap <silent> <F8> :TlistOpen<CR>
 nnoremap <silent> <F5> :!ctags --c-kinds=+px --langmap=c:+.xc -R<CR>
@@ -90,12 +102,12 @@ nnoremap <Leader>b :b #<CR>
 nnoremap <S-tab> :tabnex<CR> 
 "nnoremap <tab> :tabnex<CR> 
 
-nnoremap <Leader>g yiw:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> -nr
-nnoremap <Leader>G yiwq:igrep! <C-r>" * -nr<ESC>
-vnoremap <Leader>g yq:igrep! "<C-r>"" <C-R>=expand('%:p:h') . '/*'<CR> -nr
-vnoremap <Leader>G yq:igrep! "<C-r>"" * -nr<ESC>
+nnoremap <Leader>g yiw:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> --exclude=tags -Inr
+nnoremap <Leader>G yiwq:igrep! <C-r>" * -Inr<ESC>
+vnoremap <Leader>g y:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> --exclude=tags -Inr
+vnoremap <Leader>G yq:igrep! "<C-r>"" * -Inr<ESC>
 
-nnoremap <Leader>t <C-w>hyiw<C-w>l:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> -nr
+nnoremap <Leader>t <C-w>hyiw<C-w>l:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> -Inr
 nnoremap <silent> <C-]> g<C-]>
 nnoremap <Leader>f [[b%b
 nnoremap <Leader>z [{v%zf
@@ -121,7 +133,8 @@ nnoremap <C-]> <C-]>zz
 
 "yank select char to null and past
 xnoremap p "_dP 
-
+"inseart list
+nnoremap <Leader>l :put=map(range(0,100),'printf(''/*0x%04x*/'',v:val)')
 nnoremap <Leader>e :e <C-R>=expand('%:p:h') . '/'<CR>
 nnoremap <Leader>n :grep! "<C-r>=expand('%:t')<CR>" <C-R>=expand('%:p:h') . '/*'<CR> -nr
 nnoremap SQ <ESC>:mksession! .vim_session<CR>:wqa<CR>
@@ -138,11 +151,11 @@ so ~/.vim/functions/xc_fun.vim
 autocmd BufRead,BufNewFile *.xc  call Xc_fun() "add file type detect, syntax file is in ~/.vim/syntax; rf :h new-filetype , :h syntax
 autocmd BufRead,BufNewFile *.xml  nnoremap <Leader>c :F<a!--<ESC>f>i--<ESC>
 autocmd BufRead,BufNewFile *.xn  nnoremap <Leader>c :F<a!--<ESC>f>i--<ESC>
-"autocmd BufRead,BufNewFile *.py  set noexpandtab
 autocmd BufRead,BufNewFile *.sh  set noexpandtab
 "au FilterWritePre * if &diff | colorscheme my_color | endif
 "
+let g:NERDCustomDelimiters = { 'asm': { 'left': '/**','right': '*/' } }
 
-"let g:jedi#goto_assignments_command = "<Leader>a"
-"let g:jedi#rename_command = ''
-"let g:jedi#goto_command = "<C-]>"
+let g:jedi#goto_assignments_command = "gD"
+let g:jedi#rename_command = ''
+let g:jedi#goto_command = "<C-]>"
