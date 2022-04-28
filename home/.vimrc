@@ -16,6 +16,8 @@ Plugin 'junegunn/vim-easy-align'
 Plugin 'davidhalter/jedi-vim'
 
 Plugin 'scrooloose/nerdcommenter'
+
+Plugin 'vhda/verilog_systemverilog.vim'
 "Plugin 'Valloric/YouCompleteMe'
 
 " All of your Plugins must be added before the following line
@@ -43,6 +45,7 @@ set expandtab "tab turn to space
 syntax on
 "set cindent
 set autoindent
+set noro
 set fileencodings=utf-8,gb18030
 set fileformats=unix,dos
 set incsearch "highlight search, realtime search
@@ -62,7 +65,7 @@ set pastetoggle=<F9>
 set conceallevel=0 "let vim not auto convert -> to chinese view
 "set grepprg=grep\ --color=always\ -n\ $*\ /dev/null
 let g:netrw_liststyle=1
-let Tlist_WinWidth=40
+let Tlist_WinWidth=50
 let Tlist_Show_One_File=1
 let Tlist_Enable_Fold_Column=0
 let g:ycm_enable_diagnostic_signs=1
@@ -74,6 +77,9 @@ au BufLeave * silent! wa
 set autowrite
 "yank to system clipboard,request "vim --version +clipboard or +xterm_clipboard
 set clipboard=unnamed
+
+set foldmethod=syntax "verilog_systemverilog.vim used
+runtime macros/matchit.vim "verilog syntax
 
 so ~/.vim/functions/add_title.vim
 nnoremap <silent> <F4> :call AddTitle()<CR>
