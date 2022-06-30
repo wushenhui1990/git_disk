@@ -18,7 +18,8 @@ Plugin 'davidhalter/jedi-vim'
 Plugin 'scrooloose/nerdcommenter'
 
 Plugin 'vhda/verilog_systemverilog.vim'
-"Plugin 'Valloric/YouCompleteMe'
+
+Plugin 'ycm-core/YouCompleteMe'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -44,10 +45,10 @@ set sc "show selected line num
 set expandtab "tab turn to space
 syntax on
 "set cindent
-set autoindent
-set noro
-set fileencodings=utf-8,gb18030
-set fileformats=unix,dos
+"set autoindent
+set noro "no readonly
+"set fileencodings=utf-8,gb18030 "set this will cause open bin file and %!xxd error
+"set fileformats=unix,dos
 set incsearch "highlight search, realtime search
 set hlsearch "keep highlight search ,:nohl to mute
 set laststatus=2
@@ -59,7 +60,7 @@ set tags=tags
 set tags+=~/.vim/tags
 set tags+=my_tags
 set complete=.,s,b,u,i "complete only scan the current buffer, see help 'complete'
-set wrapscan
+set wrapscan "search wrap end file
 "set wildmode=longest "tab complete filename
 set pastetoggle=<F9>
 set conceallevel=0 "let vim not auto convert -> to chinese view
@@ -72,13 +73,13 @@ let g:ycm_enable_diagnostic_signs=1
 let g:ycm_show_diagnostics_ui=1
 let g:ycm_autoclose_preview_window_after_completion=1
 set updatetime=1000
-colo desert
+"colo desert
 au BufLeave * silent! wa
 set autowrite
 "yank to system clipboard,request "vim --version +clipboard or +xterm_clipboard
 set clipboard=unnamed
 
-set foldmethod=syntax "verilog_systemverilog.vim used
+"set foldmethod=syntax "verilog_systemverilog.vim used
 runtime macros/matchit.vim "verilog syntax
 
 so ~/.vim/functions/add_title.vim
