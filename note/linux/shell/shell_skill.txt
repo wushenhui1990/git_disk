@@ -100,3 +100,7 @@ On the first line of the script, one can put #!/bin/sh -x to have the same effec
 
 ----------------------------------------------------------------------------------------------------
 
+vim diff bin
+
+vimdiff <(xxd a.bin) <(xxd b.bin)
+
