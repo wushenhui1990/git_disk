@@ -114,7 +114,7 @@ static int get_bit(char *buf, char bit_index)
     return (buf[buf_index] >> bit_shift) & 1;
 }
 
-void calc_acc_val(long *acc, unsigned int *rom, int dsd_is_high, int coef_count)
+void calc_acc_val(unsigned long *acc, unsigned int *rom, int dsd_is_high, int coef_count)
 {
     int coef = rom[coef_count];
     int mult;
@@ -124,22 +124,25 @@ void calc_acc_val(long *acc, unsigned int *rom, int dsd_is_high, int coef_count)
     }else{
         mult = -coef;
     }
-    acc_t =  ((unsigned long)(mult & 0x80000000) << 4);
-    acc_t |= ((unsigned long)(mult & 0x80000000) << 3);
-    acc_t |= ((unsigned long)(mult & 0x80000000) << 2);
-    acc_t |= ((unsigned long)(mult & 0x80000000) << 1);
+    acc_t =  ( ( (unsigned long)mult & 0x80000000) << 4);
+    acc_t |= (((unsigned long)mult & 0x80000000) << 3);
+    acc_t |= (((unsigned long)mult & 0x80000000) << 2);
+    acc_t |= (((unsigned long)mult & 0x80000000) << 1);
     acc_t |= mult;
-    //acc_t &= (unsigned long)0xfffffffff;
+    acc_t &= (unsigned long)0xfffffffff;
     if(coef_count == 0){
         *acc = acc_t;
     }else{
         *acc = *acc + acc_t;
     }
-    //*acc &= (unsigned long)0xfffffffff;
+    *acc &= (unsigned long)0xfffffffff;
     //printf("acc2:%lx\n", *acc);
 #if 0
-    if(rom == rom0 && zero_cross){
-        printf("coef:0x%08x, coef_count:0x%02x, mult:%08x, acc:%09x\n",coef, coef_count, mult, *acc);
+    if(rom == rom3){
+        //printf("coef:0x%08x, coef_count:0x%02x, mult:%08x, acc:%09x\n",coef, coef_count, mult, *acc);
+        printf("coef:0x%08x, %d mult:%08x, acc:%09lx\n",coef, dsd_is_high, mult, *acc);
+    }else{
+        printf("coef:0x%08x, %d mult:%08x, acc:%09lx|",coef, dsd_is_high, mult, *acc);
     }
 #endif
 }
@@ -164,14 +167,16 @@ static int p_data(char *file_name)
     long acc1 = 0;
     long acc2 = 0;
     long acc3 = 0;
-    long pcm;
-    long pcmx;
+    unsigned long pcm;
+    unsigned long pcmx;
     int pcm_sample;
     unsigned char r_start_index = 0;
     int dsd_r_byte = 0;
     int pcm_byte = 0;
     unsigned int sample;
     FILE* f= NULL;
+    int flag = 0;
+    int ram_valid = 0;
     f= fopen(file_name,"r");
     if(!f)
     {
@@ -179,13 +184,23 @@ static int p_data(char *file_name)
         return -1;
     }
 
-    while(fscanf(f, "%x", &sample)){
+    while(fscanf(f, "%x", &sample) > 0){
         unsigned char data = 0;
         data = sample;
         dsd_r_byte += 1;
-        //printf("0x0000%02x\n", data);
-        for(j=0; j<8; j+=4){
-            put_bit_to_buf( !!(data & (0x80 >> j)), !!(data & (0x80 >> (j + 1))), !!(data & (0x80 >> (j + 2))), !!(data & (0x80 >> (j + 3))));
+        //printf("o:0x0000%02x\n", data);
+        flag++;
+        if(flag == 1){
+            for(k=0; k<8; k+=4){
+                put_bit_to_buf( !!(data & (0x80 >> k)), !!(data & (0x80 >> (k + 1))), !!(data & (0x80 >> (k + 2))), !!(data & (0x80 >> (k + 3))));
+            }
+        }else{
+            k = 0;
+            put_bit_to_buf( !!(data & (0x80 >> k)), !!(data & (0x80 >> (k + 1))), !!(data & (0x80 >> (k + 2))), !!(data & (0x80 >> (k + 3))));
+            k += 4;
+        }
+        if(flag == 1){
+            continue;
         }
 
         r_start_index = bit_buf_index;
@@ -197,23 +212,49 @@ static int p_data(char *file_name)
             r_start_index++;
             r_start_index &= 0x3f;
         }
+        if(flag >= 2){
+            put_bit_to_buf( !!(data & (0x80 >> k)), !!(data & (0x80 >> (k + 1))), !!(data & (0x80 >> (k + 2))), !!(data & (0x80 >> (k + 3))));
+            flag = 0;
+        }
         pcm = acc0 + acc1 + acc2 + acc3;
-        if(pcm & ((long)0x3 << 33) == (long)0x3 << 33){
+        pcm &= (unsigned long)0xfffffffff;
+        //printf("acc:0x%09lx, 0x%09lx, 0x%09lx, 0x%09lx\n", acc0, acc1, acc2, acc3);
+        if( ( (pcm >> 33) & 0x7) == 0x3){
             pcmx = 0xC0000000;
-        }else if(pcm & ( (long)0x4 << 33) == (long)0x4 << 33){
+        }else if( ( (pcm >> 33) & 0x7) == 0x4){
             pcmx = 0x13fffffff;
         }else{
             pcmx = (pcm >> 3) & 0x1ffffffff;
         }
-        if(((pcmx >> 28) & 0x1f) == 0 ||
-                ((pcmx >> 28) & 0x1f) == 0x1f){
-            zero_cross = 1;
+        //printf("pcmx:%09lx, :%x\n", pcmx, bit_buf_index);
+#if 1
+        if(zero_cross == 0){
+            if(bit_buf_index == 0x38){
+                ram_valid = 1;
+            }
+            if( (((pcmx >> 28) & 0x1f) == 0) ||
+                    (((pcmx >> 28) & 0x1f) == 0x1f)){
+                if(ram_valid){
+                    zero_cross = 1;
+                }
+            }
         }
         pcm_sample = (pcmx >> 1) + (pcmx & 1);
         if(zero_cross){
-            printf("0x%08x\n", pcm_sample);
+            printf("%08x\n", pcm_sample);
             pcm_byte += 4;
         }
+#else
+        if( (((pcmx >> 28) & 0x1f) == 0) ||
+                (((pcmx >> 28) & 0x1f) == 0x1f)){
+            zero_cross = 1;
+        }
+        pcm_sample = (pcmx >> 1) + (pcmx & 1);
+        printf("pcm:0x%09lx, pcmx:0x%09lx, comv:0x%08x, z:%d\n", pcm, pcmx, pcm_sample, zero_cross);
+        if(dsd_r_byte > 1024){
+            break;
+        }
+#endif
         //printf("%02x%02x00\n", (data >> 8), data & 0xff);
     }
     //printf("dsd bytes:%d,pcm bytes:%d\n", dsd_r_byte, pcm_byte);

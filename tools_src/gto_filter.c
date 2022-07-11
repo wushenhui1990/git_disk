@@ -16,6 +16,8 @@ static int ram_w_index;
 static int ram_r_index;
 
 static long accum;
+static int sample_count;
+int zero_cross = 0;
 static void calc_one_sample(unsigned int sample, int up_times)
 {
     int romad;
@@ -27,6 +29,7 @@ static void calc_one_sample(unsigned int sample, int up_times)
     long firculc;
     int max_calc = 1024;
     int calc_times = 64;
+    long out_data = 0;
 
     ram_r_index = ram_w_index + 1;
 
@@ -50,6 +53,7 @@ static void calc_one_sample(unsigned int sample, int up_times)
             calc_times >>= 3;
             break;
     }
+    sample_count++;
     //printf("in:0x%08x\n", sample);
     for(i=0; i<max_calc; i++){
         romad = (romad - 1) & 0x7FF;
@@ -88,11 +92,21 @@ static void calc_one_sample(unsigned int sample, int up_times)
             //printf("out:0x%08X\n", (accum >> 7) & 0x1ffffffff);
             int t = (accum >> 38) & 0x7;
             if(t > 0 && t <= 0x3){
-                printf("%09lx\n", 0x7fffffff);
+                out_data = 0x7fffffff;
             }else if( t >= 0x4 && t < 0x7){
-                printf("%09lx\n", 0x180000001);
+                out_data = 0x180000001;
             }else{
-                printf("%09lx\n", (accum >> 7) & 0x1ffffffff);
+                out_data = (accum >> 7) & 0x1ffffffff;
+            }
+            if(zero_cross == 0){
+                if(sample_count > 46){
+                    if( ((out_data >> 29) & 0xf) == 0 ||
+                            ((out_data >> 29) & 0xf) == 0xf){
+                        zero_cross = 1;
+                    }
+                }
+            }else{
+                printf("%09lx\n", out_data);
             }
             //printf("%08x\n", (accum >> 7) & 0x1ffffffff);
             accum = (mult & (1L<<39)) << 1 | (mult);
