@@ -7,7 +7,6 @@ long sigmaadder2;
 long sigmaadder3;
 long sigmaadder4;
 long sigmaadder5;
-long sigmaadder5t;
 long sigmalim1;
 long sigmalim2;
 long sigmalim3;
@@ -15,7 +14,6 @@ long sigmalim4;
 long localadder;
 long locallim;
 long quantize;
-long quantizet;
 
 unsigned int dsd_data_out;
 unsigned int dsd_data_shift;
@@ -23,58 +21,6 @@ unsigned int dsd_data_shift;
 static void calc_sample_bit(unsigned long sample)
 {
     long bit_val;
-
-    localadder = sigmaadder5t - quantizet;
-    localadder &= (1UL<<39) - 1;
-
-    if((localadder & (1UL << 38)) == 0 &&
-            (
-            (localadder & (1UL << 37)) || 
-            (localadder & (1UL << 36)) || 
-            (localadder & (1UL << 35)) || 
-            (localadder & (1UL << 34))
-            )
-            ){
-        locallim = 0x3ffffffff;
-    }else if((localadder & (1UL << 38)) &&
-            (
-            ((localadder & (1UL << 37)) == 0) || 
-            ((localadder & (1UL << 36)) == 0) || 
-            ((localadder & (1UL << 35)) == 0) || 
-            ((localadder & (1UL << 34)) == 0)
-            )
-            ){
-        locallim = 0x7c00000001;
-    }else{
-        locallim = localadder;
-    }
-
-
-    bit_val = (sigmalim4 >> 38) & 1;
-    sigmaadder5 = (bit_val << 38) | 
-        ((sigmalim4 >> 1) & ((1UL<<38)-1));
-    sigmaadder5 += locallim;
-    sigmaadder5 &= (1UL<<39) - 1;
-    //printf("**addr5:%010lx, locallim:%010lx, sigmalim1:%010lx\n", sigmaadder5, locallim, sigmalim4);
-
-    if((sigmaadder5 & (1UL << 38)) == 0){
-        quantize = 0xffffffff;
-    }else{
-        quantize = 0x7f00000001;
-    }
-
-    if((quantize & (1UL<<38)) == 0){
-        dsd_data_out |= (1 << dsd_data_shift);
-    }else{
-        dsd_data_out &= ~(1 << dsd_data_shift);
-    }
-    dsd_data_shift++;
-    //printf("out:%08x\n", dsd_data_out);
-    if(dsd_data_shift >= 32){
-        printf("%08x\n", dsd_data_out);
-        dsd_data_shift = 0;
-        dsd_data_out = 0;
-    }
 
     bit_val = (sample >> 32) & 1;
     sigmaadder1 = (bit_val << 38) | (bit_val << 37) | (bit_val << 36) |(bit_val << 35) |(bit_val << 34) |(bit_val << 33) | sample;
@@ -109,16 +55,11 @@ static void calc_sample_bit(unsigned long sample)
     sigmaadder4 &= (1UL<<39) - 1;
     sigmaadder4 += sigmalim4;
     sigmaadder4 &= (1UL<<39) - 1;
-    bit_val = (sigmaadder5t >> 38) & 1;
+    bit_val = (sigmaadder5 >> 38) & 1;
     sigmaadder4 -= (bit_val << 38) | (bit_val << 37) | (bit_val << 36) | (bit_val << 35) | (bit_val << 34) | (bit_val << 33) | (bit_val << 32) | (bit_val << 31) | 
-        ((sigmaadder5t >> 8) & ((1UL<<32)-1));
+        ((sigmaadder5 >> 8) & ((1UL<<32)-1));
     sigmaadder4 &= (1UL<<39) - 1;
 
-}
-
-static void sample_change_to_bit(void)
-{
-    long bit_val;
     if((sigmaadder1 & (1UL << 38)) == 0 &&
             (
              (sigmaadder1 & (1UL << 37)) ||
@@ -200,10 +141,62 @@ static void sample_change_to_bit(void)
     }else{
         sigmalim4 = sigmaadder4;
     }
+}
 
-    sigmaadder5t = sigmaadder5;
-    quantizet = quantize;
+static void dsd_out(void)
+{
+    long bit_val;
 
+    localadder = sigmaadder5 - quantize;
+    localadder &= (1UL<<39) - 1;
+
+    if((localadder & (1UL << 38)) == 0 &&
+            (
+            (localadder & (1UL << 37)) || 
+            (localadder & (1UL << 36)) || 
+            (localadder & (1UL << 35)) || 
+            (localadder & (1UL << 34))
+            )
+            ){
+        locallim = 0x3ffffffff;
+    }else if((localadder & (1UL << 38)) &&
+            (
+            ((localadder & (1UL << 37)) == 0) || 
+            ((localadder & (1UL << 36)) == 0) || 
+            ((localadder & (1UL << 35)) == 0) || 
+            ((localadder & (1UL << 34)) == 0)
+            )
+            ){
+        locallim = 0x7c00000001;
+    }else{
+        locallim = localadder;
+    }
+
+    bit_val = (sigmalim4 >> 38) & 1;
+    sigmaadder5 = (bit_val << 38) | 
+        ((sigmalim4 >> 1) & ((1UL<<38)-1));
+    sigmaadder5 += locallim;
+    sigmaadder5 &= (1UL<<39) - 1;
+    //printf("**addr5:%010lx, locallim:%010lx, sigmalim1:%010lx\n", sigmaadder5, locallim, sigmalim4);
+
+    if((sigmaadder5 & (1UL << 38)) == 0){
+        quantize = 0xffffffff;
+    }else{
+        quantize = 0x7f00000001;
+    }
+
+    if((quantize & (1UL<<38)) == 0){
+        dsd_data_out |= (1 << dsd_data_shift);
+    }else{
+        dsd_data_out &= ~(1 << dsd_data_shift);
+    }
+    dsd_data_shift++;
+    //printf("out:%08x\n", dsd_data_out);
+    if(dsd_data_shift >= 32){
+        printf("%08x\n", dsd_data_out);
+        dsd_data_shift = 0;
+        dsd_data_out = 0;
+    }
 }
 
 static void p_debug(void)
@@ -211,7 +204,7 @@ static void p_debug(void)
     printf("addr1:%010lx, addr2:%010lx,addr3:%010lx,addr4:%010lx,addr5:%010lx,localaddr:%010lx\n", sigmaadder1,
             sigmaadder2,sigmaadder3,sigmaadder4,sigmaadder5, localadder);
     printf("lim1:%010lx, lim2:%010lx,lim3:%010lx,lim4:%010lx, localim:%010lx, qe:%010lx, qt:%010lx\n", sigmalim1,
-            sigmalim2,sigmalim3,sigmalim4, locallim, quantize, quantizet);
+            sigmalim2,sigmalim3,sigmalim4, locallim, quantize, quantize);
 }
 
 static int p_data(char *file_name)
@@ -232,7 +225,7 @@ static int p_data(char *file_name)
 
     //printf("out file name:%s\n", out_file_name);
 
-    quantizet = 0xffffffff;
+    quantize = 0xffffffff;
     fin= fopen(file_name,"r");
     if(!fin)
     {
@@ -257,13 +250,12 @@ static int p_data(char *file_name)
         }
         //printf("in 0x%lx\n", sample);
         for(i=0; i<32; i++){
+            dsd_out();
             calc_sample_bit(sample);
-            sample_change_to_bit();
-            //calc_sample_bit(sample);
             //p_debug();
         }
-        t_count++;
 #if 0
+        t_count++;
         if(t_count > 4096){
             break;
         }
