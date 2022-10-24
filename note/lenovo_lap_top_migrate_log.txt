@@ -1,0 +1,5 @@
+dd bs=16M if=/dev/sda1 |ssh root@192.168.x.xx "dd bs=16M of=/dev/sda1" status=progress 
+ssh-keygen + ssh-copy-id 到目标ip,实现免密码
+linux gpart resize 工具实现dd 不同大小分区后 分区大小与实际不一样问题.
+建立一个fat32分区放efi文件,分别编辑fat32中的efi文件与C盘efi文件实现boot 
+重新装驱动可以选整个驱动文件夹,系统会自动一个个目录云找.

@@ -1,0 +1,7 @@
+Create a drop-in file for getty@tty1.service with the following contents:
+
+/etc/systemd/system/getty@tty1.service.d/autologin.conf
+
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty -o '-p -f -- \\u' --noclear --autologin username %I $TERM
