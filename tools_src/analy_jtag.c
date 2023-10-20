@@ -53,8 +53,10 @@ typedef enum
     ISC_ERASE         = 0x05,
     ERASE_DONE        = 0x09,
     READ_ID_CODE      = 0x11,
+    READ_USER_CODE    = 0x13,
     ISC_ENABLE        = 0x15,
     FAST_PROGRAM      = 0x17,
+    READ_STATUS       = 0x41,
     JTAG_EF_PROGRAM   = 0x71,
     JTAG_EF_READ      = 0x73,
     JTAG_EF_ERASE     = 0x75,
@@ -70,8 +72,10 @@ static struct jtag_tap_name c_name[] =
 {ISC_ERASE,"ISC_ERASE"},
 {ERASE_DONE,"ERASE_DONE"},
 {READ_ID_CODE,"READ_ID_CODE"},
+{READ_USER_CODE,"READ_USER_CODE"},
 {ISC_ENABLE,"ISC_ENABLE"},
 {FAST_PROGRAM,"FAST_PROGRAM"},
+{READ_STATUS,"READ_STATUS"},
 {JTAG_EF_PROGRAM,"JTAG_EF_PROGRAM"},
 {JTAG_EF_READ,"JTAG_EF_READ"},
 {JTAG_EF_ERASE,"JTAG_EF_ERASE"},
@@ -150,8 +154,10 @@ static int jtag_tap = RESET;
 
 static unsigned char *ir_in;
 static unsigned char ir_in_temp;
+static unsigned char ir_in_last;
 static unsigned char *ir_out;
 static unsigned char ir_out_temp;
+static unsigned char ir_out_last;
 
 static int ir_count;
 static int ir_filled;
@@ -159,9 +165,11 @@ static int ir_bit_count;
 
 static unsigned char *dr_out;
 static unsigned char dr_out_temp;
+static unsigned char dr_out_last;
 
 static unsigned char *dr_in;
 static unsigned char dr_in_temp;
+static unsigned char dr_in_last;
 
 static int dr_count;
 static int dr_filled;
@@ -172,6 +180,9 @@ static int dr_relative_count;
 
 static int addr_flag;
 static int addr_count;
+
+//#define IN_MSB_SHIFT
+//#define OUT_MSB_SHIFT
 static int jtag_data(struct jtag_raw_data jd)
 {
     if(jd.tck != 1){
@@ -193,10 +204,18 @@ static int jtag_data(struct jtag_raw_data jd)
             }
         }
         if(jd.tdi){
+#ifdef IN_MSB_SHIFT
+            ir_in_temp |= (1<< (7 - ir_bit_count) );
+#else
             ir_in_temp |= (1<<ir_bit_count);
+#endif
         }
         if(jd.tdo){
+#ifdef OUT_MSB_SHIFT
+            ir_out_temp |= (1<< (7 - ir_bit_count) );
+#else
             ir_out_temp |= (1<<ir_bit_count);
+#endif
         }
         ir_bit_count++;
         if(ir_bit_count == 8){
@@ -223,15 +242,20 @@ static int jtag_data(struct jtag_raw_data jd)
 #if 1
             {
                 int i;
-                for(i=0; i<=sizeof(c_name)/sizeof(c_name[0]); i++)
+                for(i=0; i<sizeof(c_name)/sizeof(c_name[0]); i++)
                 {
                     if(ir_in_temp == c_name[i].tap){
                         printf("%s\n",c_name[i].name);
                         break;
                     }
                 }
+                if(i >= sizeof(c_name)/sizeof(c_name[0])){
+                    printf("ir unknow\n");
+                }
             }
 #endif
+            ir_in_last = ir_in_temp;
+            ir_out_last = ir_out_temp;
             ir_in_temp = 0;
             ir_out_temp = 0;
         }
@@ -252,12 +276,18 @@ static int jtag_data(struct jtag_raw_data jd)
             }
         }
         if(jd.tdi){
-            //dr_in_temp |= (1<<dr_bit_count);
+#ifdef IN_MSB_SHIFT
             dr_in_temp |= (1<< (7 - dr_bit_count) );
+#else
+            dr_in_temp |= (1<<dr_bit_count);
+#endif
         }
         if(jd.tdo){
-            //dr_out_temp |= (1<<dr_bit_count);
+#ifdef OUT_MSB_SHIFT
             dr_out_temp |= (1<<( 7 - dr_bit_count));
+#else
+            dr_out_temp |= (1<<dr_bit_count);
+#endif
         }
         dr_bit_count++;
         if(dr_bit_count == 8){
@@ -274,6 +304,8 @@ static int jtag_data(struct jtag_raw_data jd)
                 printf("\n");
                 dr_count_pp = 0;
             }
+            dr_in_last = dr_in_temp;
+            dr_out_last = dr_out_temp;
             dr_in_temp = 0;
             dr_out_temp = 0;
         }
@@ -374,26 +406,57 @@ static int jtag_tms(struct jtag_raw_data jd)
     }
     if( (last_tap == SHIFT_DR && jtag_tap != SHIFT_DR) || 
             (last_tap == SHIFT_IR && jtag_tap != SHIFT_IR)){
+        int temp_in;
+        int temp_out;
         if(dr_bit_count){
-            printf("unfinish 8bit dr,bit count:%d, in val:%02x, out val:%02x\n",dr_bit_count, dr_in_temp, dr_out_temp);
+#ifdef IN_MSB_SHIFT
+            temp_in = (dr_in_last << 16) | dr_in_temp;
+            temp_in >>= 1;
+#else
+            temp_in = dr_in_last | (dr_in_temp << 8);
+            temp_in <<= 1;
+#endif
+#ifdef OUT_MSB_SHIFT
+            temp_out = (dr_out_last << 16) | dr_out_temp;
+            temp_out >>= 1;
+#else
+            temp_out = dr_out_last | (dr_out_temp << 8);
+            temp_out <<= 1;
+#endif
+
+            printf("unfinish 8bit dr,bit count:%d, in val:%06x, out val:%06x\n",dr_bit_count, temp_in, temp_out);
             dr_bit_count = 0;
             dr_out_temp = 0;
         }
         if(ir_bit_count){
-            printf("unfinish 8bit ir,bit count:%d, in val:%02x, out val:%02x\n",ir_bit_count, ir_in_temp, ir_out_temp);
+#ifdef IN_MSB_SHIFT
+            temp_in = (ir_in_last << 8) | ir_in_temp;
+            temp_in >>= 1;
+#else
+            temp_in = ir_in_last | (ir_in_temp << 8);
+            temp_in <<= 1;
+#endif
+#ifdef OUT_MSB_SHIFT
+            temp_out = (ir_out_last << 8) | ir_out_temp;
+            temp_out >>= 1;
+#else
+            temp_out = ir_out_last | (ir_out_temp << 8);
+            temp_out <<= 1;
+#endif
+            printf("unfinish 8bit ir,bit count:%d, in val:%06x, out val:%06x\n",ir_bit_count, temp_in, temp_out);
             ir_bit_count = 0;
             ir_out_temp = 0;
         }
     }
-#if 1
+#if 0
     same_taps_count++;
     if(last_tap != jtag_tap){
         int i;
-        printf("count:%d\n",same_taps_count);
+        //printf("same tap count:%d\n",same_taps_count);
         for(i=0; i<=UPDATE_IR; i++)
         {
             if(jtag_tap == j_name[i].tap){
-                printf("jtag tap:%s,",j_name[i].name);
+                printf("%s,",j_name[i].name);
                 break;
             }
         }
@@ -423,7 +486,7 @@ static int parse_jtag(void)
     struct jtag_raw_data *rd0 = raw_data_buf;
     struct jtag_raw_data *rd1 = raw_data_buf + 1;
     for(i=0; i<raw_data_filled; i++){
-        judge_delay(*rd0, *rd1);
+        //judge_delay(*rd0, *rd1);
         if(0 == rd0->tck && 1 == rd1->tck){
             jtag_data(*rd1);
             jtag_tms(*rd1);

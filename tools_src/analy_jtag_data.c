@@ -53,8 +53,10 @@ typedef enum
     ISC_ERASE         = 0x05,
     ERASE_DONE        = 0x09,
     READ_ID_CODE      = 0x11,
+    READ_USER_CODE    = 0x13,
     ISC_ENABLE        = 0x15,
     FAST_PROGRAM      = 0x17,
+    READ_STATUS       = 0x41,
     JTAG_EF_PROGRAM   = 0x71,
     JTAG_EF_READ      = 0x73,
     JTAG_EF_ERASE     = 0x75,
@@ -70,8 +72,10 @@ static struct jtag_tap_name c_name[] =
 {ISC_ERASE,"ISC_ERASE"},
 {ERASE_DONE,"ERASE_DONE"},
 {READ_ID_CODE,"READ_ID_CODE"},
+{READ_USER_CODE,"READ_USER_CODE"},
 {ISC_ENABLE,"ISC_ENABLE"},
 {FAST_PROGRAM,"FAST_PROGRAM"},
+{READ_STATUS,"READ_STATUS"},
 {JTAG_EF_PROGRAM,"JTAG_EF_PROGRAM"},
 {JTAG_EF_READ,"JTAG_EF_READ"},
 {JTAG_EF_ERASE,"JTAG_EF_ERASE"},
@@ -225,7 +229,7 @@ static int jtag_data(struct jtag_raw_data jd)
 #if 0
             {
                 int i;
-                for(i=0; i<=sizeof(c_name)/sizeof(c_name[0]); i++)
+                for(i=0; i<sizeof(c_name)/sizeof(c_name[0]); i++)
                 {
                     if(ir_in_temp == c_name[i].tap){
                         printf("%s\n",c_name[i].name);

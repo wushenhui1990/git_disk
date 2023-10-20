@@ -49,9 +49,11 @@ int main(int argc, char *argv[])
 			count2 |= 0x8000;
 		}
 		#else
-		*p2++ = count1;
-		*p2++ = count1;
-		count1++;
+		*p2++ = 0xaaf1;
+		*p2++ = 0xaaf1;
+		//*p2++ = count1;
+		//*p2++ = count1;
+		//count1++;
 
 		#endif
 	}

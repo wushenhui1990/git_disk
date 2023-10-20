@@ -5,3 +5,6 @@ find $SYNC_HOME -maxdepth 1 -mindepth 1| while read line; do
 	NAME=${NAME##*/}
 	rsync -r -v  "$HOME/$NAME" $SYNC_HOME
 done
+
+cp $HOME/.vimrc $SYNC_HOME
+cp $HOME/.bashrc $SYNC_HOME

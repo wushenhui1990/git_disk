@@ -1,3 +1,4 @@
 *.swp
 tags
 home/.ssh
+home/.vim/bundle
