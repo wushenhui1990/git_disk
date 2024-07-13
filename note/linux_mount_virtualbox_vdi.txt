@@ -1,0 +1,9 @@
+Linux-挂载vdi文件
+pacman -S qemu-img
+modprobe nbd
+qemu-nbd -c /dev/nbd0 $vdi
+fdisk -l /dev/nbd0
+mount /dev/nbd0p1 /mnt
+mount
+qemu-nbd --disconnect /dev/bnd0
+
