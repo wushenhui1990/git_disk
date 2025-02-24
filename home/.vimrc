@@ -13,13 +13,12 @@ Plugin 'VundleVim/Vundle.vim'
 
 Plugin 'junegunn/vim-easy-align'
 " Keep Plugin commands between vundle#begin/end.
-Plugin 'davidhalter/jedi-vim'
+"Plugin 'davidhalter/jedi-vim'
 
 Plugin 'scrooloose/nerdcommenter'
 
 Plugin 'vhda/verilog_systemverilog.vim'
-
-Plugin 'ycm-core/YouCompleteMe'
+"Plugin 'Valloric/YouCompleteMe'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -44,11 +43,11 @@ set nu
 set sc "show selected line num
 set expandtab "tab turn to space
 syntax on
-"set cindent
-"set autoindent
-set noro "no readonly
-"set fileencodings=utf-8,gb18030 "set this will cause open bin file and %!xxd error
-"set fileformats=unix,dos
+set cindent
+set autoindent
+set noro
+set fileencodings=utf-8,gb18030
+set fileformats=unix,dos
 set incsearch "highlight search, realtime search
 set hlsearch "keep highlight search ,:nohl to mute
 set laststatus=2
@@ -73,7 +72,7 @@ let g:ycm_enable_diagnostic_signs=1
 let g:ycm_show_diagnostics_ui=1
 let g:ycm_autoclose_preview_window_after_completion=1
 set updatetime=1000
-"colo desert
+colo desert
 au BufLeave * silent! wa
 set autowrite
 "yank to system clipboard,request "vim --version +clipboard or +xterm_clipboard
@@ -93,7 +92,8 @@ xmap <Leader>a <Plug>(EasyAlign)
 nmap <Leader>a <Plug>(EasyAlign)
 nnoremap <silent> <F7> :cw<CR>
 nnoremap <silent> <F8> :TlistOpen<CR>
-nnoremap <silent> <F5> :!ctags --c-kinds=+px --langmap=c:+.xc -R<CR>
+so ~/.vim/functions/ctags_fun.vim
+nnoremap <silent> <F5> :call Ctags_fun()<CR>
 
 nnoremap <silent> [b :bprevious<CR>
 nnoremap <silent> ]b :bnext<CR>
@@ -109,14 +109,23 @@ nnoremap <Leader>b :b #<CR>
 nnoremap <S-tab> :tabnex<CR> 
 "nnoremap <tab> :tabnex<CR> 
 
-nnoremap <Leader>g yiw:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> --exclude=tags -Inr
-nnoremap <Leader>G yiwq:igrep! <C-r>" * -Inr<ESC>
-vnoremap <Leader>g y:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> --exclude=tags -Inr
-vnoremap <Leader>G yq:igrep! "<C-r>"" * -Inr<ESC>
+nnoremap <Leader>g yiw:grep! "<C-r>"" <C-R>=expand('%:p:h') . '/*'<CR> --exclude-from=vim_config/grep_exclude.txt -Inr
+nnoremap <Leader>G yiwq:igrep! "<C-r>"" * --exclude-from=vim_config/grep_exclude.txt -Inr<ESC>
+vnoremap <Leader>g y:grep! "<C-r>"" <C-R>=expand('%:p:h') . '/*'<CR> --exclude-from=vim_config/grep_exclude.txt -Inr
+vnoremap <Leader>G yq:igrep! "<C-r>"" * --exclude-from=vim_config/grep_exclude.txt -Inr<ESC>
+
+nnoremap <Leader>s :grep! "<C-r>*" <C-R>=expand('%:p:h') . '/*'<CR> --exclude-from=vim_config/grep_exclude.txt -Inr 
+nnoremap <Leader>S :grep! "<C-r>*" * --exclude-from=vim_config/grep_exclude.txt -Inr
+"vnoremap <Leader>g y:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> --exclude-from=vim_config/grep_exclude.txt -Inr
+"vnoremap <Leader>G yq:igrep! "<C-r>"" * --exclude-from=vim_config/grep_exclude.txt -Inr<ESC>
+"grep the str in clipboard
+"nnoremap <Leader>F :grep! "<C-r>*" * --exclude-from=vim_config/grep_exclude.txt -Inr
+
+"jump to function head
+nnoremap <Leader>f [[b%b
 
 nnoremap <Leader>t <C-w>hyiw<C-w>l:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> -Inr
 nnoremap <silent> <C-]> g<C-]>
-nnoremap <Leader>f [[b%b
 nnoremap <Leader>z [{v%zf
 nnoremap <Leader>r "9yiw:,$s/<C-r>9/
 vnoremap <Leader>r "9y:,$s/<C-r>9/
@@ -130,12 +139,11 @@ nnoremap <Leader>d :bprevious<CR>:bdelete #<CR>
 nnoremap [i :[I "show all tags
 
 "reselect last visual select
-nnoremap <Leader>s `>V`<
+"nnoremap <Leader>s `>V`<
 
 nnoremap <C-n> :nohl<CR>
 nnoremap <C-l> :ls<CR>:b 
-nnoremap <C-g> 1<C-g> "show full path
-nnoremap <C-p> diw"0P
+"nnoremap <C-p> diw"0P
 nnoremap <C-]> <C-]>zz
 
 "yank select char to null and past
@@ -155,10 +163,13 @@ if &diff
 endif
 
 so ~/.vim/functions/xc_fun.vim
+so ~/.vim/functions/verilog_fun.vim
 autocmd BufRead,BufNewFile *.xc  call Xc_fun() "add file type detect, syntax file is in ~/.vim/syntax; rf :h new-filetype , :h syntax
 autocmd BufRead,BufNewFile *.xml  nnoremap <Leader>c :F<a!--<ESC>f>i--<ESC>
 autocmd BufRead,BufNewFile *.xn  nnoremap <Leader>c :F<a!--<ESC>f>i--<ESC>
 autocmd BufRead,BufNewFile *.sh  set noexpandtab
+autocmd BufRead,BufNewFile *.S  set noautoindent 
+autocmd BufRead,BufNewFile *.v  call Verilog_fun()
 "au FilterWritePre * if &diff | colorscheme my_color | endif
 "
 let g:NERDCustomDelimiters = { 'asm': { 'left': '/**','right': '*/' } }
