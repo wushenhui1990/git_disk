@@ -36,6 +36,7 @@ shopt -s histappend
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 HISTSIZE=100000
 HISTFILESIZE=200000
+PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -124,6 +125,7 @@ HISTSIZE=2000000
 HISTFILESIZE=2000000
 
 PATH=~/git_disk/bin:~/git_disk/sh:$PATH
+PATH=$PATH:~/nds32le-elf-mculib-v3s/bin
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
@@ -132,5 +134,6 @@ alias svndiff='svn diff|colordiff|less -r'
 #cd X1000/platform
 #source tools/build/source.sh
 
-source ~/xTIMEcomposer/Community_14.3.3/SetEnv
+#source ~/xTIMEcomposer/Community_14.4.1/SetEnv
+source ~/XTC/15.3.1/SetEnv
 export HISTTIMEFORMAT="%d/%m/%y %T "

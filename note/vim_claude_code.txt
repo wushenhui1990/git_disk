@@ -1,0 +1,14 @@
+ mkdir -p ~/.claude && nano ~/.claude/settings.json
+
+ 粘贴这个最小配置(密钥从这边 C:\Users\sandy\.claude\settings.json 第 3 行抄)：
+
+ {
+   "env": {
+     "ANTHROPIC_AUTH_TOKEN": "a1a4509c6cda4f6cb3af8c5c83dbb577.kpihf1meNc9dYDXS",
+     "ANTHROPIC_BASE_URL": "https://open.bigmodel.cn/api/anthropic",
+     "ANTHROPIC_MODEL": "glm-5.2[1M]",
+     "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-5.2[1M]",
+     "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-5.2[1M]",
+     "ANTHROPIC_DEFAULT_HAIKU_MODEL": "glm-5.2"
+   }
+ }

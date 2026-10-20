@@ -1,0 +1,35 @@
+
+
+WARNING: When enabling Legacy Unsafe Renegotiation, SSL connections will be vulnerable to the Man-in-the-Middle prefix attack as described in CVE-2009-3555.
+
+With the help of https://bugs.launchpad.net/bugs/1963834 and https://bugs.launchpad.net/ubuntu/+source/gnutls28/+bug/1856428
+
+Beware that editing your system's openssl.conf is not recommended, because you might lose your changes once openssl is updated.
+
+Create a custom openssl.cnf file in any directory with these contents:
+
+openssl_conf = openssl_init
+
+[openssl_init]
+ssl_conf = ssl_sect
+
+[ssl_sect]
+system_default = system_default_sect
+
+[system_default_sect]
+Options = UnsafeLegacyRenegotiation
+
+Before running your program, make sure your OPENSSL_CONF environment variable is set to your custom openssl.cnf full path when running the scraper like so:
+
+OPENSSL_CONF=/path/to/custom/openssl.cnf python your_scraper.py
+
+or like so:
+
+export OPENSSL_CONF=/path/to/custom/openssl.cnf
+python your_scraper.py
+
+or, if you are using pipenv or systemd or docker, place this into your .env file
+
+OPENSSL_CONF=/path/to/custom/openssl.cnf
+
+

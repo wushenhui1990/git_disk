@@ -1,2 +1,12 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =0
+let g:netrw_dirhistcnt =2
+let g:netrw_dirhist_2='/home/sandy/projects/xmos_xs3/app_luna_ingenii/src'
+let g:netrw_dirhist_1='/home/sandy/projects/xmos_xs3/app_luna_ingenii'
+let g:netrw_dirhist_0='/home/sandy/projects/xmos_xs3/app_idsd_gr2/src'
+let g:netrw_dirhist_9='/home/sandy/projects/xmos_xs3/module_k2_filter/test'
+let g:netrw_dirhist_8='/home/sandy/projects/xmos_xs3/module_k2_filter/tools'
+let g:netrw_dirhist_7='/home/sandy/projects/xmos_xs3/module_k2_filter'
+let g:netrw_dirhist_6='/home/sandy/projects/xmos_xs3/module_k2_filter/test'
+let g:netrw_dirhist_5='/home/sandy/projects/xmos_xs3/module_k2_filter'
+let g:netrw_dirhist_4='/home/sandy/projects/xmos_xs3/module_k2_filter/tools'
+let g:netrw_dirhist_3='/home/sandy/projects/xmos_xs3/module_k2_filter'

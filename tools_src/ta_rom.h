@@ -1,4 +1,4 @@
-static unsigned int rom[] =
+static unsigned int ta_rom[] =
 {
       //rom sel 0 0
       0x00013CF8,

@@ -1,0 +1,242 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "apd_rom.h"
+#include "gto_rom.h"
+#include "ta_rom.h"
+#include "bp_rom.h"
+
+#define ROMAD_1024_START_INDEX 0x3FF
+#define ROMAD_512_START_INDEX 0xBFF
+#define ROMAD_MAX_INDEX 0x7FF
+
+#define TO_16X 1
+enum{
+    FILTER_BP,
+    FILTER_GTO,
+    FILTER_APD,
+    FILTER_TA,
+};
+static unsigned int ram[128];
+
+static int ram_w_index;
+static int ram_r_index;
+
+static long accum;
+static int sample_count;
+int zero_cross = 0;
+int last_romaddr;
+static void calc_one_sample(unsigned int sample, int up_times, int filter_id)
+{
+    int romad;
+    int romaddr;
+    int data_rdo;
+    int coef;
+    int i;
+    long mult;
+    long firculc;
+    int max_calc = 1024;
+    int out_data = 0;
+    unsigned int *rom = NULL;
+
+    switch(filter_id){
+        case FILTER_BP:
+            rom = bp_rom;
+            break;
+        case FILTER_GTO:
+            rom = gto_rom;
+            break;
+        case FILTER_APD:
+            rom = apd_rom;
+            break;
+        case FILTER_TA:
+            rom = ta_rom;
+            break;
+    }
+    ram_r_index = ram_w_index + 1;
+    ram_r_index &= (128 -1);
+
+    switch(up_times){
+        case 8:
+            romad = ROMAD_1024_START_INDEX;
+            break;
+        case 4:
+            romad = (ROMAD_1024_START_INDEX >> 1) | (1 << 10);
+            max_calc >>= 1;
+            break;
+        case 2:
+            romad = (ROMAD_1024_START_INDEX >> 2) | (3 << 9);
+            max_calc >>= 2;
+            break;
+    }
+    sample_count++;
+    //printf("in:0x%08x\n", sample);
+    for(i=0; i<max_calc; i++){
+        romad = (romad - 1) & 0x7FF;
+        switch(up_times){
+            case 16:
+                romaddr = (romad & (1<<10)) | ((romad & (0x3f)) << 4) | ( ((romad >> 6) & 0xf) ^ 0xf);
+                break;
+            case 8:
+                //romaddr = (romad & (0x3<<9)) | ((romad & (0x3f)) << 3) | ( ((romad >> 6) & 0x7) ^ 0x7);
+                romaddr = (romad & (1<<10)) | ((romad & (0x7f)) << 3) | ( ((romad >> 7) & 0x7) ^ 0x7);
+                break;
+            case 4:
+                romaddr = (romad & (0x3<<9)) | ((romad & (0x7f)) << 2) | ( ((romad >> 7) & 0x3) ^ 0x3);
+                break;
+            case 2:
+                romaddr = (romad & (0x7<<8)) | ((romad & (0x7f)) << 1) | ( ((romad >> 7) & 0x1) ^ 0x1);
+                break;
+        }
+
+        coef = rom[romaddr];
+        //printf("addr:%4d 0x%04X,addr diff:%5d val:%10d 0x%08X\n", romaddr, romaddr, last_romaddr - romaddr, coef, coef);
+        last_romaddr = romaddr;
+        data_rdo = ram[ram_r_index++];
+
+        ram_r_index &= (128 -1);
+
+        mult = data_rdo;
+        mult *= coef;
+        mult >>= 24;
+        mult &= (1L<<41) - 1;
+        accum += (mult & (1L<<40)) << 1 | (mult);
+        /*
+        if(data_rdo || accum){
+            printf("data_rdo:%08X, mult:%LX, accum:%LX\n", data_rdo, mult, accum);
+        }
+        */
+        if((i + 1) % 128 == 0){
+            //printf("out:0x%08X\n", (accum >> 7) & 0x1ffffffff);
+            int t = (accum >> 39) & 0x7;
+            if(t > 0 && t <= 0x3){
+                out_data = 0x7fffffff;
+            }else if( t >= 0x4 && t < 0x7){
+                out_data = 0x80000001;
+            }else{
+                out_data = (accum >> 8) & 0xffffffff;
+            }
+            printf("%08x\n", out_data);
+
+            //printf("%08x\n", (accum >> 7) & 0x1ffffffff);
+            accum = (mult & (1L<<40)) << 1 | (mult);
+        }
+    }
+
+    ram[ram_w_index++] = sample;
+    ram_w_index &= (128 -1);
+}
+
+static int p_data(char *file_name, int txt_up_times, char* filter_str)
+{
+    int read_len;
+    int data_len = 0;
+    short bytes;
+    int sample_rate;
+    int up_times = 16;
+    int i;
+    FILE* f= NULL;
+    int filter_id = 0;
+    f= fopen(file_name,"r");
+    if(!f)
+    {
+        printf("open:%s,failed\n",file_name);
+        return -1;
+    }
+    if(strcmp(filter_str, "bp") == 0){
+        filter_id = FILTER_BP;
+    }else if(strcmp(filter_str, "gto") == 0){
+        filter_id = FILTER_GTO;
+    }else if(strcmp(filter_str, "apd") == 0){
+        filter_id = FILTER_APD;
+    }else if(strcmp(filter_str, "ta") == 0){
+        filter_id = FILTER_TA;
+    }else{
+        printf("unknow filter:%s\n", filter_str);
+        return -1;
+    }
+    if(txt_up_times == 0){ //wav file
+        fseek(f, 24, SEEK_SET);
+        read_len = fread(&sample_rate, 4, 1, f);
+        if(read_len < 1){
+            printf("read:%s,failed\n",file_name);
+            return -1;
+        }
+        if(sample_rate % 44100 == 0){
+            up_times = 8 / ((sample_rate / 44100));
+        }else{
+            up_times = 8 / ((sample_rate / 48000));
+        }
+        //printf("up times:%d\n", up_times);
+
+        fseek(f, 34, SEEK_SET);
+        read_len = fread(&bytes, 2, 1, f);
+        if(read_len < 1){
+            printf("read:%s,failed\n",file_name);
+            return -1;
+        }
+        bytes /= 8;
+        //printf("byte persample:%d\n", bytes);
+
+        fseek(f, 40, SEEK_SET);
+        read_len = fread(&data_len, 4, 1, f);
+
+        if(read_len < 1){
+            printf("read:%s,failed\n",file_name);
+            return -1;
+        }
+        //printf("data len:%d\n", data_len);
+        //printf("tell:%d\n", ftell(f));
+
+        for(i=0; i< data_len / bytes / 2; i++){
+            //for(i=0; i< 4; i++){
+            unsigned int data;
+            read_len = fread(&data, bytes, 1, f);
+            if(read_len < 1){
+                printf("read:%s,failed\n",file_name);
+                return -1;
+            }
+            //printf("0x%08x\n", data);
+            //printf("o:%02x%02x00\n", (data >> 8), data & 0xff);
+            switch(bytes){
+                case 2:
+                    calc_one_sample(data << 16, up_times, filter_id);
+                    break;
+                case 3:
+                    calc_one_sample(data << 8, up_times, filter_id);
+                    break;
+                default:
+                    calc_one_sample(data, up_times, filter_id);
+                    break;
+            }
+            fread(&data, bytes, 1, f);
+        }
+    }else{
+        unsigned int sample;
+        while(fscanf(f, "%x", &sample) > 0){
+            calc_one_sample(sample, txt_up_times, filter_id);
+        }
+    }
+
+    fclose(f);
+    return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    if(argc == 3){
+        char *p = &argv[1][strlen(argv[1]) - 3];
+        if(*p == 'w' && *(p+1) == 'a' && *(p+2) == 'v'){
+            return p_data(argv[1], 0, argv[2]);
+        }
+    }else if(argc == 4){
+        char *p = &argv[1][strlen(argv[1]) - 3];
+        if(*p == 't' && *(p+1) == 'x' && *(p+2) == 't'){
+            return p_data(argv[1], atoi(argv[2]), argv[3]);
+        }
+    }
+
+    printf("args: wave file or txt file, up times, filter type\n");
+    return -1;
+}

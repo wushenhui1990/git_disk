@@ -14,10 +14,10 @@ static int p_data(char *file_name0, char *file_name1, int bytes)
     int diff_2_count = 0;
     int diff_3_count = 0;
     int diff_l, diff_r;
-    unsigned int data0l = 0;
-    unsigned int data0r = 0;
-    unsigned int data1l = 0;
-    unsigned int data1r = 0;
+    int data0l = 0;
+    int data0r = 0;
+    int data1l = 0;
+    int data1r = 0;
     FILE* f1 = NULL;
     FILE* f0 = NULL;
 
@@ -45,8 +45,13 @@ static int p_data(char *file_name0, char *file_name1, int bytes)
         fread(&data1r, bytes, 1, f1);
 
         c_size += bytes << 1;
-        diff_l = abs(data0l - data1l);
-        diff_r = abs(data0r - data1r);
+        if(bytes == 2){
+            diff_l = abs((short)data0l - (short)data1l);
+            diff_r = abs((short)data0r - (short)data1r);
+        }else{
+            diff_l = abs(data0l - data1l);
+            diff_r = abs(data0r - data1r);
+        }
         if(diff_l > 2 || diff_r > 2){
             diff_3_count++;
             printf("0x%x,0x%x --- 0x%x,0x%x, p:%d\n", data0l, data0r, data1l, data1r, c_samples);
@@ -79,6 +84,6 @@ int main(int argc, char *argv[])
     if(argc == 4){
         return p_data(argv[1], argv[2], atoi(argv[3]));
     }else{
-        printf("args: txt, sample bytes\n");
+        printf("args: pcm1, pcm2, bytes\n");
     }
 }

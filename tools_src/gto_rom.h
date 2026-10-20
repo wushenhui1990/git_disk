@@ -1,4 +1,4 @@
-static unsigned int rom[] =
+static unsigned int gto_rom[] =
 {
       //rom sel 10
       0x01D076B3,

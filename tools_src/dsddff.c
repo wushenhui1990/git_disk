@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 {
 	FILE *fp;
 	char id[4];
-	unsigned char chunk[] = {0x00,0x00};
+	unsigned char chunk[] = {0xfc,0xfc};
 	uint64 size;
 	char *p;
 	char temp[8];
@@ -43,6 +43,7 @@ int main(int argc, char *argv[])
 	for(i=0; i<size/sizeof(chunk); i++)
 	{
 		fwrite(chunk, sizeof(chunk), 1, fp);
+#if 0
 		if(chunk[0] == 0xff && chunk[1] == 0xff)
 		{
 			chunk[0] = chunk[1] = 0;
@@ -75,6 +76,7 @@ int main(int argc, char *argv[])
 
 			}
 		}
+#endif
 	}
 
 	

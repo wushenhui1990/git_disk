@@ -1,0 +1,12 @@
+Firefox分国内版和国际版，两个版本账号不互通，国际版更简洁一点。
+
+浏览器地址栏打开 about:config
+
+搜索找到 identity.fxaccounts.autoconfig.uri 这个选项
+
+修改为https://accounts.firefox.com.cn 这个网址是国内账号
+
+修改为 https://accounts.firefox.com/ 国际账号
+
+修改好后 直接点击头像登录就可以了。
+

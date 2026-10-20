@@ -1,4 +1,6 @@
 *.swp
+*.wav
+*.pcm
 tags
 home/.ssh
 home/.vim/bundle

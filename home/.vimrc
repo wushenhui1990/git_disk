@@ -15,6 +15,8 @@ Plugin 'junegunn/vim-easy-align'
 " Keep Plugin commands between vundle#begin/end.
 "Plugin 'davidhalter/jedi-vim'
 
+Plugin 'rishi-opensource/vim-claude-code'
+
 Plugin 'scrooloose/nerdcommenter'
 
 Plugin 'vhda/verilog_systemverilog.vim'
@@ -48,6 +50,7 @@ set autoindent
 set noro
 set fileencodings=utf-8,gb18030
 set fileformats=unix,dos
+set formatoptions-=cro
 set incsearch "highlight search, realtime search
 set hlsearch "keep highlight search ,:nohl to mute
 set laststatus=2
@@ -109,10 +112,23 @@ nnoremap <Leader>b :b #<CR>
 nnoremap <S-tab> :tabnex<CR> 
 "nnoremap <tab> :tabnex<CR> 
 
-nnoremap <Leader>g yiw:grep! "<C-r>"" <C-R>=expand('%:p:h') . '/*'<CR> --exclude-from=vim_config/grep_exclude.txt -Inr
-nnoremap <Leader>G yiwq:igrep! "<C-r>"" * --exclude-from=vim_config/grep_exclude.txt -Inr<ESC>
-vnoremap <Leader>g y:grep! "<C-r>"" <C-R>=expand('%:p:h') . '/*'<CR> --exclude-from=vim_config/grep_exclude.txt -Inr
-vnoremap <Leader>G yq:igrep! "<C-r>"" * --exclude-from=vim_config/grep_exclude.txt -Inr<ESC>
+function! Grep_exclude(word, path)
+    if filereadable("vim_config/grep_exclude.txt")
+        let cmdstr = ':grep! "' . a:word . '" ' . a:path . ' --exclude-from=vim_config/grep_exclude.txt -Inr'
+    else
+        let cmdstr = ':grep! "' . a:word . '" ' . a:path . ' -Inr'
+    endif
+    call feedkeys(cmdstr, 'n')
+endfunction
+
+"nnoremap <Leader>g yiw:grep! "<C-r>"" <C-R>=expand('%:p:h') . '/*'<CR> --exclude-from=vim_config/grep_exclude.txt -Inr
+nnoremap <Leader>g :call Grep_exclude(expand('<cword>'), expand('%:p:h') . '/*')<CR>
+"nnoremap <Leader>G yiwq:igrep! "<C-r>"" * --exclude-from=vim_config/grep_exclude.txt -Inr<ESC>
+nnoremap <Leader>G :call Grep_exclude(expand('<cword>'), '*')<CR>
+"vnoremap <Leader>g y:grep! "<C-r>"" <C-R>=expand('%:p:h') . '/*'<CR> --exclude-from=vim_config/grep_exclude.txt -Inr
+vnoremap <Leader>g y:call Grep_exclude(getreg('"'), expand('%:p:h') . '/*')<CR>
+"vnoremap <Leader>G yq:igrep! "<C-r>"" * --exclude-from=vim_config/grep_exclude.txt -Inr<ESC>
+vnoremap <Leader>G y:call Grep_exclude(getreg('"'), '*')<CR>
 
 nnoremap <Leader>s :grep! "<C-r>*" <C-R>=expand('%:p:h') . '/*'<CR> --exclude-from=vim_config/grep_exclude.txt -Inr 
 nnoremap <Leader>S :grep! "<C-r>*" * --exclude-from=vim_config/grep_exclude.txt -Inr
@@ -122,7 +138,7 @@ nnoremap <Leader>S :grep! "<C-r>*" * --exclude-from=vim_config/grep_exclude.txt 
 "nnoremap <Leader>F :grep! "<C-r>*" * --exclude-from=vim_config/grep_exclude.txt -Inr
 
 "jump to function head
-nnoremap <Leader>f [[b%b
+nnoremap <Leader>f ?^[^ \t{]<CR>:nohl<CR>f(b
 
 nnoremap <Leader>t <C-w>hyiw<C-w>l:grep! <C-r>" <C-R>=expand('%:p:h') . '/*'<CR> -Inr
 nnoremap <silent> <C-]> g<C-]>
@@ -172,6 +188,7 @@ autocmd BufRead,BufNewFile *.S  set noautoindent
 autocmd BufRead,BufNewFile *.v  call Verilog_fun()
 "au FilterWritePre * if &diff | colorscheme my_color | endif
 "
+colorscheme my_color
 let g:NERDCustomDelimiters = { 'asm': { 'left': '/**','right': '*/' } }
 
 let g:jedi#goto_assignments_command = "gD"

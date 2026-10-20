@@ -11,7 +11,7 @@ static char wav_header[] =
     'f', 'm', 't', ' ', 
     16, 0, 0, 0,   
     1, 0, 
-    1, 0, 
+    2, 0, 
     0x44, 0xac, 0, 0, //sample rate*
     0x02, 0xb1, 0x1, 0, //byte rate *
     0x03, 0,  //blockalign *
@@ -60,7 +60,7 @@ static int p_data(char *file_name, int rate_times, int base_rate)
     int data_len = 0;
     short bytes;
     int i;
-    unsigned char buf[16];
+    int sample_read;
     int w_data_size = 0;
     int w_samples = 0;
     FILE* fout = NULL;
@@ -72,7 +72,7 @@ static int p_data(char *file_name, int rate_times, int base_rate)
 
     strcpy(&out_name[strlen(out_name) - 3], "wav");
 
-    fout = fopen(out_name, "w");
+    fout = fopen(out_name, "w+");
     if(!fout)
     {
         printf("open:%s,failed\n",file_name);
@@ -87,21 +87,23 @@ static int p_data(char *file_name, int rate_times, int base_rate)
     }
 
     fwrite(wav_header, sizeof(wav_header), 1, fout);
-    while(fscanf(fin, "%X %X %X %X %X %X %X %X %X %X %X %X %X %X %X %X\n", 
-                &buf[0], &buf[1], &buf[2], &buf[3],
-                &buf[4], &buf[5], &buf[6], &buf[7],
-                &buf[8], &buf[9], &buf[10], &buf[11],
-                &buf[12], &buf[13], &buf[14], &buf[15]) > 0){
-        fwrite(buf, 16, 1, fout);
-        w_data_size += 16;
+    while(fscanf(fin, "%X\n", &sample_read) > 0){
+        char byte[3];
+        sample_read = (sample_read >> 8) & 0xffffff;
+        byte[0] = sample_read & 0xff;
+        byte[1] = (sample_read >> 8) & 0xff; 
+        byte[2] = sample_read >> 16;
+        fwrite(byte, 3, 1, fout);
+        fwrite(byte, 3, 1, fout);
+        w_data_size += 6;
         w_samples++;
     }
 
     printf("w size:%d, samples:%d, to %s\n", w_data_size, w_samples, out_name);
     if(base_rate == 44100){
-        set_wav_header(2, (44100 * rate_times),  w_data_size);
+        set_wav_header(3, (44100 * rate_times),  w_data_size);
     }else{
-        set_wav_header(2, (48000 * rate_times),  w_data_size);
+        set_wav_header(3, (48000 * rate_times),  w_data_size);
     }
     fseek(fout, 0, SEEK_SET);
     fwrite(wav_header, sizeof(wav_header), 1, fout);

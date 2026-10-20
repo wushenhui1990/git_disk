@@ -1,0 +1,1 @@
+just use grep -a option trited as text and -C 100
